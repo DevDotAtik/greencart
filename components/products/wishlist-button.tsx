@@ -18,7 +18,7 @@ export function WishlistButton({ productId, className }: WishlistButtonProps) {
       type="button"
       onClick={() => toggleWishlist(productId)}
       className={cn(
-        "inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white",
+        "inline-flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 bg-white",
         active && "border-rose-200 bg-rose-50 text-rose-600",
         className,
       )}

@@ -60,7 +60,7 @@ export function CartView() {
               <div>
                 <p className="text-lg font-bold">{item.product?.name}</p>
                 <p className="mt-1 text-sm text-ink-500">
-                  Sold by {item.product?.farmerName} • {item.product?.state}
+                  Sold by {item.product?.farmerName} | {item.product?.state}
                 </p>
                 <p className="mt-3 text-lg font-extrabold text-ink-900">
                   {formatCurrency(item.product?.price ?? 0)}

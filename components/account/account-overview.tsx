@@ -9,7 +9,16 @@ import { ProductVisual } from "@/components/shared/product-visual";
 export function AccountOverview() {
   const { data: session } = useSession();
   const { ids } = useWishlistStore();
-  const user = users.find((candidate) => candidate.email === (session?.user?.email ?? "buyer@greencart.in")) ?? users[0];
+  const user =
+    users.find((candidate) => candidate.email === (session?.user?.email ?? "buyer@greencart.in")) ??
+    {
+      ...users[0],
+      name: session?.user?.name ?? "GreenCart User",
+      email: session?.user?.email ?? "buyer@greencart.in",
+      role: session?.user?.role ?? "buyer",
+      addresses: [],
+      wishlist: [],
+    };
   const wishlistProducts = products.filter((product) =>
     [...user.wishlist, ...ids].includes(product.id),
   );
@@ -20,18 +29,22 @@ export function AccountOverview() {
         <div className="surface-card p-6">
           <p className="text-2xl font-extrabold">{session?.user?.name ?? user.name}</p>
           <p className="mt-2 text-sm text-ink-500">
-            {session?.user?.email ?? user.email} • {session?.user?.role ?? user.role}
+            {session?.user?.email ?? user.email} | {session?.user?.role ?? user.role}
           </p>
           <div className="mt-6 space-y-4">
-            <div className="rounded-3xl bg-slate-50 p-4">
+            <div className="rounded-2xl bg-brand-50/60 p-4">
               <p className="text-sm font-bold text-ink-700">Saved addresses</p>
-              {user.addresses.map((address) => (
-                <p key={address.id} className="mt-2 text-sm text-ink-500">
-                  {address.line1}, {address.city}, {address.state} {address.pincode}
-                </p>
-              ))}
+              {user.addresses.length ? (
+                user.addresses.map((address) => (
+                  <p key={address.id} className="mt-2 text-sm text-ink-500">
+                    {address.line1}, {address.city}, {address.state} {address.pincode}
+                  </p>
+                ))
+              ) : (
+                <p className="mt-2 text-sm text-ink-500">Add your first delivery address after checkout.</p>
+              )}
             </div>
-            <div className="rounded-3xl bg-slate-50 p-4">
+            <div className="rounded-2xl bg-brand-50/60 p-4">
               <p className="text-sm font-bold text-ink-700">Notifications</p>
               <p className="mt-2 text-sm text-ink-500">
                 Price drop alert enabled for organic turmeric and mango box.
@@ -70,7 +83,7 @@ export function AccountOverview() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {wishlistProducts.map((product) => (
-            <Link key={product.id} href={`/products/${product.slug}`} className="rounded-3xl border border-slate-200 p-4 hover:border-brand-200">
+            <Link key={product.id} href={`/products/${product.slug}`} className="rounded-2xl border border-brand-100 p-4 hover:border-brand-300">
               <ProductVisual
                 title={product.name}
                 subtitle={product.unit}

@@ -1,7 +1,23 @@
 import { Schema, model, models } from "mongoose";
 
+const addressSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    label: { type: String, required: true },
+    recipient: { type: String, required: true },
+    line1: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: { type: String, required: true },
+    phone: { type: String, required: true },
+    primary: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
 const userSchema = new Schema(
   {
+    id: { type: String, required: true, unique: true, index: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, index: true },
     mobile: { type: String, required: true, unique: true },
@@ -13,8 +29,9 @@ const userSchema = new Schema(
       index: true,
     },
     avatar: String,
-    farmerId: { type: Schema.Types.ObjectId, ref: "Farmer" },
-    wishlist: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+    farmerId: String,
+    wishlist: { type: [String], default: [] },
+    addresses: { type: [addressSchema], default: [] },
   },
   { timestamps: true },
 );

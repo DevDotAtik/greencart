@@ -42,7 +42,7 @@ export function OrdersClient({ seededOrders }: OrdersClientProps) {
             <div>
               <p className="text-lg font-extrabold">{order.id}</p>
               <p className="mt-1 text-sm text-ink-500">
-                Placed on {formatDate(order.placedAt)} • Estimated delivery {formatDate(order.estimatedDelivery)}
+                Placed on {formatDate(order.placedAt)} | Estimated delivery {formatDate(order.estimatedDelivery)}
               </p>
             </div>
             <div className="text-left sm:text-right">

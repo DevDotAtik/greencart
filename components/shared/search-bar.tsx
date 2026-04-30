@@ -42,7 +42,7 @@ export function SearchBar({ className }: SearchBarProps) {
 
   return (
     <div className={cn("relative w-full", className)}>
-      <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm">
+      <div className="flex items-center gap-3 rounded-xl border border-brand-100 bg-white px-4 py-3 shadow-sm">
         <Search className="h-4 w-4 text-ink-400" />
         <input
           value={value}
@@ -52,7 +52,7 @@ export function SearchBar({ className }: SearchBarProps) {
         />
         <button
           type="button"
-          className="hidden rounded-full bg-slate-100 p-2 text-ink-500 md:inline-flex"
+          className="hidden rounded-lg bg-brand-50 p-2 text-ink-500 md:inline-flex"
           aria-label="Voice search coming soon"
         >
           <Mic className="h-4 w-4" />
@@ -60,7 +60,7 @@ export function SearchBar({ className }: SearchBarProps) {
       </div>
 
       {results.length ? (
-        <div className="absolute left-0 right-0 top-[calc(100%+12px)] z-30 rounded-3xl border border-slate-200 bg-white p-3 shadow-soft">
+        <div className="absolute left-0 right-0 top-[calc(100%+12px)] z-30 rounded-2xl border border-brand-100 bg-white p-3 shadow-soft">
           <div className="mb-2 flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">
             <Sparkles className="h-3.5 w-3.5" />
             Live suggestions
@@ -70,7 +70,7 @@ export function SearchBar({ className }: SearchBarProps) {
               <Link
                 key={result.id}
                 href={`/products/${result.slug}`}
-                className="flex items-center justify-between rounded-2xl px-3 py-3 hover:bg-slate-50"
+                className="flex items-center justify-between rounded-xl px-3 py-3 hover:bg-brand-50"
               >
                 <div>
                   <p className="text-sm font-semibold text-ink-800">{result.label}</p>

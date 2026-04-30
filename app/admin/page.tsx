@@ -60,7 +60,7 @@ export default async function AdminPage() {
                     <div>
                       <p className="font-bold">{product.name}</p>
                       <p className="mt-1 text-sm text-ink-500">
-                        {product.farmerName} • {product.category} • {product.state}
+                        {product.farmerName} | {product.category} | {product.state}
                       </p>
                     </div>
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-ink-600">

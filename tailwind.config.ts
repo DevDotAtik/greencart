@@ -52,6 +52,8 @@ const config: Config = {
         card: "0 14px 38px -24px rgba(15, 23, 42, 0.2)",
       },
       borderRadius: {
+        "2xl": "1rem",
+        "3xl": "1.25rem",
         "4xl": "2rem",
       },
     },

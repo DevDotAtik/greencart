@@ -37,5 +37,20 @@ export const farmerProductSchema = z.object({
   state: z.string().min(2),
   stock: z.number().min(0),
   organic: z.boolean(),
+  farmerId: z.string().optional(),
+  farmerName: z.string().min(2).optional(),
+  deliveryTime: z.string().min(2).optional(),
+  images: z.array(z.string().url()).min(1).optional(),
+  tags: z.array(z.string().min(1)).max(6).optional(),
   description: z.string().min(20),
+});
+
+export const enquirySchema = z.object({
+  type: z.enum(["sell", "bulk", "contact"]),
+  name: z.string().min(2),
+  email: z.string().email(),
+  phone: z.string().min(10).max(13).optional().or(z.literal("")),
+  company: z.string().optional(),
+  subject: z.string().min(2).optional(),
+  requirement: z.string().min(10),
 });

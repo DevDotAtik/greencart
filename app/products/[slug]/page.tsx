@@ -93,15 +93,15 @@ export default async function ProductDetailPage({
                 </p>
               </div>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-2xl bg-brand-50/60 p-4">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-400">Unit</p>
                   <p className="mt-2 font-bold">{product.unit}</p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-2xl bg-brand-50/60 p-4">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-400">Harvested</p>
                   <p className="mt-2 font-bold">{formatDate(product.harvestDate)}</p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-2xl bg-brand-50/60 p-4">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-400">Delivery</p>
                   <p className="mt-2 font-bold">{product.deliveryTime}</p>
                 </div>
@@ -115,21 +115,21 @@ export default async function ProductDetailPage({
 
             <div className="surface-card p-6">
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-2xl bg-brand-50/60 p-4">
                   <Truck className="h-4 w-4 text-brand-600" />
                   <p className="mt-3 font-bold">Fast dispatch</p>
                   <p className="mt-2 text-sm text-ink-500">{product.deliveryTime}</p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-2xl bg-brand-50/60 p-4">
                   <ShieldCheck className="h-4 w-4 text-brand-600" />
                   <p className="mt-3 font-bold">Quality checks</p>
                   <p className="mt-2 text-sm text-ink-500">Seller verified and admin reviewed.</p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-2xl bg-brand-50/60 p-4">
                   <Store className="h-4 w-4 text-brand-600" />
                   <p className="mt-3 font-bold">Seller details</p>
                   <p className="mt-2 text-sm text-ink-500">
-                    {farmer?.farmName ?? product.farmerName} • {product.state}
+                    {farmer?.farmName ?? product.farmerName} | {product.state}
                   </p>
                 </div>
               </div>

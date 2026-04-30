@@ -1,25 +1,71 @@
 import Link from "next/link";
-import { ArrowRight, BadgeIndianRupee, CloudSun, ShieldCheck, Tractor } from "lucide-react";
-import { Navbar } from "@/components/layout/navbar";
+import {
+  ArrowRight,
+  BadgeIndianRupee,
+  CloudSun,
+  PackagePlus,
+  ShieldCheck,
+  Sprout,
+} from "lucide-react";
+import { HeroSlideshow } from "@/components/home/hero-slideshow";
 import { Footer } from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/navbar";
 import { ProductCard } from "@/components/products/product-card";
 import { ProductVisual } from "@/components/shared/product-visual";
 import { SectionHeading } from "@/components/shared/section-heading";
-import { farmers } from "@/lib/mock-data";
-import { getCropInsights, getHomePageData } from "@/lib/services/dashboard";
 import {
   getCategories,
+  getFarmers,
   getFeaturedProducts,
   getTrendingProducts,
 } from "@/lib/services/catalog";
+import { getCropInsights, getHomePageData } from "@/lib/services/dashboard";
 import { formatCurrency } from "@/utils/format";
 
+const categoryVisuals: Record<string, string> = {
+  fruits:
+    "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=1200&q=80",
+  vegetables:
+    "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=1200&q=80",
+  grains:
+    "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=1200&q=80",
+  dairy:
+    "https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=1200&q=80",
+  organic:
+    "https://images.unsplash.com/photo-1532336414038-cf19250c5757?auto=format&fit=crop&w=1200&q=80",
+  seeds:
+    "https://images.unsplash.com/photo-1457530378978-8bac673b8062?auto=format&fit=crop&w=1200&q=80",
+  fertilisers:
+    "https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?auto=format&fit=crop&w=1200&q=80",
+  "crop-care":
+    "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+};
+
+const benefitCards = [
+  {
+    title: "Daily groceries",
+    copy: "Fruits, vegetables, grains, dairy and kitchen staples in a simpler layout.",
+    icon: Sprout,
+  },
+  {
+    title: "Agri inputs too",
+    copy: "Browse seeds, fertilisers and crop care products from the same catalog.",
+    icon: PackagePlus,
+  },
+  {
+    title: "Farmer-first supply",
+    copy: "New user registration and add-product flows are ready for Mongo-backed use.",
+    icon: ShieldCheck,
+  },
+];
+
 export default async function HomePage() {
-  const [featuredProducts, trendingProducts, categoryList, homeData] = await Promise.all([
+  const [featuredProducts, trendingProducts, categoryList, homeData, farmers] = await Promise.all([
     getFeaturedProducts(),
     getTrendingProducts(),
     getCategories(),
     getHomePageData(),
+    getFarmers(),
   ]);
 
   const cropInsights = getCropInsights();
@@ -27,246 +73,231 @@ export default async function HomePage() {
   return (
     <>
       <Navbar />
-      <main>
-        <section className="shell pt-8 sm:pt-10">
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="surface-card overflow-hidden p-8 sm:p-10">
-              <div className="flex flex-wrap gap-3">
-                <span className="tag-pill">Fresh farm produce</span>
-                <span className="tag-pill bg-ocean text-sky-700">Live mandi insights</span>
-                <span className="tag-pill bg-orange-50 text-orange-700">Retail + wholesale</span>
-              </div>
-              <div className="mt-8 max-w-2xl space-y-5">
-                <h1 className="font-serif text-5xl font-bold leading-tight sm:text-6xl">
-                  Buy direct from farmers with marketplace-grade convenience.
-                </h1>
-                <p className="max-w-xl text-base leading-7 text-ink-600 sm:text-lg">
-                  GreenCart connects households, retailers, and wholesalers to
-                  verified growers with fair pricing, live government market
-                  data, and fast fulfilment-ready commerce flows.
-                </p>
-              </div>
-              <div className="mt-8 flex flex-wrap gap-3">
+      <main className="pb-8">
+        <section className="shell pt-8">
+          <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
+            <div className="surface-card p-6 sm:p-8">
+              <span className="tag-pill">GreenCart marketplace</span>
+              <h1 className="mt-6 max-w-xl text-4xl font-black leading-tight text-emerald-950 sm:text-5xl">
+                Fresh produce and agri supplies with a cleaner, wider storefront.
+              </h1>
+              <p className="mt-4 max-w-xl text-base leading-7 text-ink-600">
+                GreenCart now uses a lighter green-and-white theme, sharper cards, real Mongo-backed
+                registration, and farmer product creation for a simpler farm commerce experience.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/products" className="primary-button">
-                  Shop marketplace
+                  Explore products
                 </Link>
-                <Link href="/farmer/dashboard" className="secondary-button">
-                  Start selling
+                <Link href="/sell-on-greencart" className="secondary-button">
+                  Sell on GreenCart
                 </Link>
               </div>
-              <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {benefitCards.map((card) => {
+                  const Icon = card.icon;
+
+                  return (
+                    <div key={card.title} className="rounded-2xl border border-brand-100 bg-brand-50/50 p-4">
+                      <Icon className="h-5 w-5 text-brand-700" />
+                      <p className="mt-3 text-lg font-bold text-emerald-950">{card.title}</p>
+                      <p className="mt-2 text-sm leading-6 text-ink-600">{card.copy}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {homeData.stats.map((stat) => (
-                  <div key={stat.label} className="rounded-3xl bg-slate-50 p-4">
-                    <p className="text-2xl font-extrabold">{stat.value}</p>
-                    <p className="mt-2 text-sm text-ink-500">{stat.label}</p>
+                  <div key={stat.label} className="rounded-2xl border border-brand-100 bg-white p-4">
+                    <p className="text-2xl font-extrabold text-emerald-950">{stat.value}</p>
+                    <p className="mt-1 text-sm text-ink-500">{stat.label}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="grid gap-6">
-              <ProductVisual
-                title="Government mandi rates, decoded for buyers and sellers."
-                subtitle="Powered by cached data.gov.in integrations with fast fallback data so the dashboard stays useful in every environment."
-                palette="from-brand-100 via-white to-ocean"
-                className="h-[290px]"
-              />
-              <div className="surface-card grid gap-4 p-6 sm:grid-cols-2">
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <ShieldCheck className="h-5 w-5 text-brand-600" />
-                  <p className="mt-4 text-lg font-bold">Verified sellers</p>
-                  <p className="mt-2 text-sm text-ink-500">
-                    Farmer KYC, product quality checks, and admin moderation.
-                  </p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <Tractor className="h-5 w-5 text-brand-600" />
-                  <p className="mt-4 text-lg font-bold">Farmer dashboard</p>
-                  <p className="mt-2 text-sm text-ink-500">
-                    Manage stock, orders, sales, and pricing suggestions.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <HeroSlideshow />
           </div>
         </section>
 
-        <section className="shell mt-20">
+        <section className="shell mt-16">
           <SectionHeading
-            eyebrow="Categories"
-            title="Shop by farm category"
-            description="A familiar ecommerce browsing experience tuned for fresh produce, staples, and agri supplies."
+            eyebrow="Shop by category"
+            title="From daily fresh produce to crop care essentials"
+            description="The catalog now includes fruits, vegetables, grains, dairy, seeds, fertilisers and pesticide-focused crop care products."
           />
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {categoryList.map((category) => (
-              <Link
-                key={category.id}
-                href={`/products?category=${category.slug}`}
-                className="surface-card block p-6 hover:-translate-y-1"
-              >
+              <Link key={category.id} href={`/products?category=${category.slug}`} className="block">
                 <ProductVisual
                   title={category.name}
                   subtitle={category.description}
-                  palette={category.accent}
-                  className="h-48"
+                  palette={categoryVisuals[category.slug] ?? category.accent}
+                  className="h-60"
                 />
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="shell mt-20">
-          <SectionHeading
-            eyebrow="Trending"
-            title="Products shoppers are picking fast"
-            description="Designed like a modern marketplace grid with quick add-to-cart actions, discounts, ratings, and delivery cues."
-          />
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {trendingProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
-
-        <section className="shell mt-20">
-          <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr]">
+        <section className="shell mt-16">
+          <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
             <div>
               <SectionHeading
-                eyebrow="Best farmer deals"
-                title="Featured by trusted growers"
-                description="Handpicked offers from verified farms with transparent seller details and better direct margins."
+                eyebrow="Trending now"
+                title="Popular products with updated online imagery"
+                description="Fresh kitchen staples and agri inputs now use remote images for a more visual shopping experience."
               />
-              <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                {featuredProducts.slice(0, 4).map((product) => (
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {trendingProducts.slice(0, 6).map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             </div>
 
             <div className="space-y-6">
-              <SectionHeading
-                eyebrow="Top sellers"
-                title="Verified farmer storefronts"
-                description="Farmers get modern storefronts, demand visibility, and admin verification support."
-              />
-              {farmers.map((farmer) => (
-                <div key={farmer.id} className="surface-card p-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-lg font-bold">{farmer.farmName}</p>
-                      <p className="mt-1 text-sm text-ink-500">
-                        {farmer.name} • {farmer.district}, {farmer.state}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
-                      {farmer.rating.toFixed(1)} rating
-                    </span>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {farmer.speciality.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-ink-500"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm text-ink-500">
-                    Usually responds {farmer.responseTime}. Selling for {farmer.yearsActive}+ years.
-                  </p>
+              <div className="surface-card p-6">
+                <SectionHeading
+                  eyebrow="Bulk and seller links"
+                  title="Built for faster B2B and farmer onboarding"
+                  description="Use the new top links to open seller, bulk enquiry and contact pages."
+                />
+                <div className="mt-6 grid gap-3">
+                  <Link href="/sell-on-greencart" className="secondary-button justify-between">
+                    Sell on GreenCart
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/bulk-order-enquiry" className="secondary-button justify-between">
+                    Bulk Order Enquiry
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/contact-us" className="secondary-button justify-between">
+                    Contact Us
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
-              ))}
+              </div>
+
+              <div className="surface-card p-6">
+                <div className="flex items-center gap-3">
+                  <CloudSun className="h-5 w-5 text-brand-700" />
+                  <p className="text-xl font-extrabold text-emerald-950">Weather and crop notes</p>
+                </div>
+                <div className="mt-5 grid gap-4">
+                  {homeData.weatherInsights.map((insight) => (
+                    <div key={insight.title} className="rounded-2xl bg-brand-50/60 p-4">
+                      <div className="flex items-end justify-between gap-3">
+                        <p className="font-bold">{insight.title}</p>
+                        <p className="text-2xl font-extrabold text-brand-700">{insight.value}</p>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-ink-600">{insight.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="shell mt-20">
-          <div className="grid gap-8 lg:grid-cols-2">
+        <section className="shell mt-16">
+          <div className="grid gap-6 xl:grid-cols-[1fr_1fr_1fr]">
             <div className="surface-card p-6">
               <div className="flex items-center justify-between gap-4">
-                <SectionHeading
-                  eyebrow="Live market pulse"
-                  title="Government mandi rates"
-                  description="Cached data.gov.in mandi snapshots translated into practical widgets for procurement teams and farmers."
-                />
-                <BadgeIndianRupee className="hidden h-10 w-10 text-brand-500 sm:block" />
+                <p className="text-xl font-extrabold text-emerald-950">Government mandi prices</p>
+                <BadgeIndianRupee className="h-5 w-5 text-brand-700" />
               </div>
-              <div className="mt-6 space-y-3">
-                {homeData.mandiRates.map((rate) => (
-                  <div
-                    key={`${rate.commodity}-${rate.market}`}
-                    className="grid gap-3 rounded-3xl border border-slate-100 bg-slate-50 p-4 sm:grid-cols-[1fr_auto]"
-                  >
-                    <div>
-                      <p className="font-bold">{rate.commodity}</p>
-                      <p className="mt-1 text-sm text-ink-500">
-                        {rate.market}, {rate.state}
-                      </p>
-                    </div>
-                    <div className="text-left sm:text-right">
-                      <p className="text-lg font-extrabold">
-                        {formatCurrency(rate.modalPrice / 100)}
-                      </p>
-                      <p className="text-xs text-ink-500">
-                        Min {formatCurrency(rate.minPrice / 100)} • Max {formatCurrency(rate.maxPrice / 100)}
-                      </p>
-                    </div>
+              <div className="mt-5 space-y-3">
+                {homeData.mandiRates.slice(0, 3).map((rate) => (
+                  <div key={`${rate.commodity}-${rate.market}`} className="rounded-2xl border border-brand-100 p-4">
+                    <p className="font-bold">{rate.commodity}</p>
+                    <p className="mt-1 text-sm text-ink-500">
+                      {rate.market}, {rate.state}
+                    </p>
+                    <p className="mt-3 text-lg font-extrabold">{formatCurrency(rate.modalPrice / 100)}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="surface-card p-6">
-                <div className="flex items-center gap-3">
-                  <CloudSun className="h-6 w-6 text-sky-500" />
-                  <p className="text-xl font-extrabold">Weather and crop insights</p>
-                </div>
-                <div className="mt-6 grid gap-4">
-                  {homeData.weatherInsights.map((insight) => (
-                    <div key={insight.title} className="rounded-3xl bg-slate-50 p-5">
-                      <div className="flex items-end justify-between gap-3">
-                        <p className="font-bold">{insight.title}</p>
-                        <p className="text-2xl font-extrabold text-brand-700">{insight.value}</p>
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-ink-500">{insight.note}</p>
-                    </div>
-                  ))}
-                </div>
+            <div className="surface-card p-6">
+              <p className="text-xl font-extrabold text-emerald-950">Quick crop info</p>
+              <div className="mt-5 grid gap-3">
+                {cropInsights.map((insight) => (
+                  <div key={insight.title} className="rounded-2xl bg-brand-50/60 p-4">
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ink-400">
+                      {insight.title}
+                    </p>
+                    <p className="mt-2 text-2xl font-extrabold">{insight.value}</p>
+                    <p className="mt-1 text-sm text-ink-600">{insight.note}</p>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              <div className="surface-card p-6">
-                <p className="text-xl font-extrabold">Crop intelligence widgets</p>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  {cropInsights.map((insight) => (
-                    <div key={insight.title} className="rounded-3xl bg-slate-50 p-5">
-                      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-ink-400">
-                        {insight.title}
-                      </p>
-                      <p className="mt-3 text-2xl font-extrabold">{insight.value}</p>
-                      <p className="mt-2 text-sm text-ink-500">{insight.note}</p>
+            <div className="surface-card p-6">
+              <p className="text-xl font-extrabold text-emerald-950">Farmer partners</p>
+              <div className="mt-5 space-y-3">
+                {farmers.slice(0, 3).map((farmer) => (
+                  <div key={farmer.id} className="rounded-2xl border border-brand-100 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-bold">{farmer.farmName}</p>
+                        <p className="text-sm text-ink-500">
+                          {farmer.name}, {farmer.state}
+                        </p>
+                      </div>
+                      <span className="tag-pill">{farmer.rating.toFixed(1)} rating</span>
                     </div>
-                  ))}
-                </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {farmer.speciality.map((item) => (
+                        <span key={item} className="rounded-xl bg-brand-50 px-3 py-1 text-xs font-medium text-ink-600">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="shell mt-20">
-          <div className="surface-card flex flex-col items-start justify-between gap-6 overflow-hidden bg-gradient-to-r from-brand-500 to-brand-600 p-8 text-white lg:flex-row lg:items-center">
+        <section className="shell mt-16">
+          <SectionHeading
+            eyebrow="Featured catalog"
+            title="More products for homes, retailers and repeat buyers"
+            description="The marketplace now blends grocery-style shopping with farm input discovery."
+          />
+
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {featuredProducts.slice(0, 8).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+
+        <section className="shell mt-16">
+          <div className="surface-card flex flex-col items-start justify-between gap-6 bg-brand-50 p-8 lg:flex-row lg:items-center">
             <div>
-              <p className="font-serif text-3xl font-bold">Ready for buyers, retailers, and farmer collectives.</p>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80">
-                The project ships with App Router pages, API routes, Mongo models,
-                auth, dashboard scaffolding, and Vercel-ready conventions.
+              <p className="font-serif text-3xl font-bold text-emerald-950">
+                Need bulk supply or want to onboard your farm?
+              </p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-600">
+                Use the new enquiry pages or jump into the farmer dashboard to add products directly into the catalog.
               </p>
             </div>
-            <Link href="/products" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-brand-700">
-              Explore catalog
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/bulk-order-enquiry" className="primary-button">
+                Bulk Order Enquiry
+              </Link>
+              <Link href="/farmer/dashboard" className="secondary-button">
+                Open Farmer Dashboard
+              </Link>
+            </div>
           </div>
         </section>
       </main>

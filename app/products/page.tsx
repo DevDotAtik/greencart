@@ -28,8 +28,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <main className="shell py-10">
         <SectionHeading
           eyebrow="Marketplace"
-          title="Browse fresh products from verified Indian farmers"
-          description="Amazon- and Flipkart-inspired browsing with clean filters, direct farmer information, and fast add-to-cart actions."
+          title="Browse fresh produce, seeds, pesticides and fertilisers"
+          description="A wider and cleaner catalog with sharper cards, simpler filters and updated online product imagery."
         />
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -43,7 +43,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <a
                       key={category.id}
                       href={`/products?category=${category.slug}`}
-                      className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-ink-600"
+                      className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:bg-brand-50"
                     >
                       {category.name}
                     </a>
@@ -57,7 +57,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <a
                       key={state}
                       href={`/products?state=${encodeURIComponent(state)}`}
-                      className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-ink-600"
+                      className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:bg-brand-50"
                     >
                       {state}
                     </a>
@@ -67,18 +67,18 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               <div>
                 <p className="text-sm font-bold text-ink-700">Sorting</p>
                 <div className="mt-3 grid gap-2">
-                  <a href="/products?sort=price-asc" className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-ink-600">
+                  <a href="/products?sort=price-asc" className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-ink-600">
                     Price: Low to High
                   </a>
-                  <a href="/products?sort=price-desc" className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-ink-600">
+                  <a href="/products?sort=price-desc" className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-ink-600">
                     Price: High to Low
                   </a>
-                  <a href="/products?sort=popularity" className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-ink-600">
+                  <a href="/products?sort=popularity" className="rounded-xl bg-brand-50 px-4 py-3 text-sm text-ink-600">
                     Popularity
                   </a>
                 </div>
               </div>
-              <div className="rounded-3xl bg-brand-50 p-4 text-sm text-brand-700">
+              <div className="rounded-2xl bg-brand-50 p-4 text-sm text-brand-700">
                 Tip: combine `category`, `state`, `organic`, `rating`, and `sort`
                 query params for shareable filter URLs.
               </div>
@@ -91,10 +91,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 Showing {productList.length} products
               </p>
               <div className="flex flex-wrap gap-2">
-                <a href="/products?organic=true" className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-ink-600">
+                <a href="/products?organic=true" className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:bg-brand-50">
                   Organic only
                 </a>
-                <a href="/products?rating=4.5" className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-ink-600">
+                <a href="/products?rating=4.5" className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:bg-brand-50">
                   4.5+ rating
                 </a>
               </div>

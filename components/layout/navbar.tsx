@@ -15,65 +15,90 @@ const navItems = [
   { href: "/account", key: "navAccount" as const },
 ];
 
+const utilityLinks = [
+  { href: "/sell-on-greencart", label: "Sell on GreenCart" },
+  { href: "/bulk-order-enquiry", label: "Bulk Order Enquiry" },
+  { href: "/contact-us", label: "Contact Us" },
+];
+
 export function Navbar() {
   const { data: session } = useSession();
   const { items } = useCartStore();
   const { dictionary, language, toggleLanguage } = useI18n();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/90 backdrop-blur-xl">
-      <div className="shell flex flex-col gap-4 py-4 lg:flex-row lg:items-center">
-        <div className="flex items-center justify-between gap-4 lg:min-w-[220px]">
-          <Logo />
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="rounded-full border border-slate-200 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-ink-600"
-          >
-            {language === "en" ? "हिंदी" : "EN"}
-          </button>
+    <header className="sticky top-0 z-40 border-b border-brand-100 bg-white/95 backdrop-blur-xl">
+      <div className="bg-brand-700 text-white">
+        <div className="shell flex flex-col gap-3 py-3 text-sm lg:flex-row lg:items-center lg:justify-between">
+          <p className="font-medium text-white/90">
+            Fresh produce, agri inputs, and direct farmer supply in one simple marketplace.
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            {utilityLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="text-white/90 hover:text-white">
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
+      </div>
 
-        <SearchBar className="lg:flex-1" />
-
-        <nav className="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-ink-600 hover:bg-slate-100 hover:text-ink-900"
-            >
-              {dictionary[item.key]}
-            </Link>
-          ))}
-
-          <Link
-            href="/cart"
-            className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-ink-700"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            {items.length ? (
-              <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold text-white">
-                {items.length}
-              </span>
-            ) : null}
-          </Link>
-
-          {session?.user ? (
+      <div className="shell py-4">
+        <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_auto] xl:items-center">
+          <div className="flex items-center justify-between gap-4">
+            <Logo />
             <button
               type="button"
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-ink-700"
+              onClick={toggleLanguage}
+              className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-ink-600"
             >
-              <UserCircle2 className="h-4 w-4" />
-              {session.user.name?.split(" ")[0]}
+              {language === "en" ? "Hindi" : "EN"}
             </button>
-          ) : (
-            <Link href="/login" className="primary-button whitespace-nowrap">
-              {dictionary.login}
+          </div>
+
+          <SearchBar className="xl:min-w-0" />
+
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <nav className="flex flex-wrap items-center gap-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-xl px-4 py-2 text-sm font-semibold text-ink-600 hover:bg-brand-50 hover:text-brand-700"
+                >
+                  {dictionary[item.key]}
+                </Link>
+              ))}
+            </nav>
+
+            <Link
+              href="/cart"
+              className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 bg-white text-ink-700"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {items.length ? (
+                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-bold text-white">
+                  {items.length}
+                </span>
+              ) : null}
             </Link>
-          )}
-        </nav>
+
+            {session?.user ? (
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="inline-flex items-center gap-2 rounded-xl border border-brand-100 px-4 py-2 text-sm font-semibold text-ink-700"
+              >
+                <UserCircle2 className="h-4 w-4" />
+                {session.user.name?.split(" ")[0]}
+              </button>
+            ) : (
+              <Link href="/login" className="primary-button whitespace-nowrap">
+                {dictionary.login}
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
     </header>
   );

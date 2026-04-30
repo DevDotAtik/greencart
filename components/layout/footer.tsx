@@ -5,37 +5,37 @@ const footerGroups = [
     title: "Marketplace",
     links: [
       { href: "/products", label: "All products" },
+      { href: "/sell-on-greencart", label: "Sell on GreenCart" },
       { href: "/farmer/dashboard", label: "Seller dashboard" },
-      { href: "/admin", label: "Admin panel" },
     ],
   },
   {
     title: "Support",
     links: [
-      { href: "/account", label: "Account" },
+      { href: "/bulk-order-enquiry", label: "Bulk Order Enquiry" },
+      { href: "/contact-us", label: "Contact Us" },
       { href: "/orders", label: "Orders" },
-      { href: "/checkout", label: "Checkout" },
     ],
   },
   {
     title: "Built for",
     links: [
-      { href: "#", label: "Customers" },
-      { href: "#", label: "Wholesalers" },
-      { href: "#", label: "Retailers" },
+      { href: "/account", label: "Customers" },
+      { href: "/bulk-order-enquiry", label: "Retailers" },
+      { href: "/bulk-order-enquiry", label: "Wholesalers" },
     ],
   },
 ];
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-slate-200 bg-white">
+    <footer className="mt-24 border-t border-brand-100 bg-[#f8fff8]">
       <div className="shell grid gap-12 py-14 lg:grid-cols-[1.2fr_repeat(3,1fr)]">
         <div className="space-y-4">
-          <p className="font-serif text-3xl font-bold">Buy better. Sell closer to the source.</p>
+          <p className="font-serif text-3xl font-bold">Simple farm commerce for everyday buying and agri supply.</p>
           <p className="max-w-md text-sm leading-6 text-ink-600">
-            GreenCart helps farmers unlock better margins while customers, retailers,
-            and wholesalers access fresher produce with full supply visibility.
+            GreenCart helps farmers sell produce and agri inputs directly while buyers, retailers,
+            and bulk teams source from one cleaner marketplace.
           </p>
         </div>
 

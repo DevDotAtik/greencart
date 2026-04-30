@@ -1,6 +1,12 @@
 import { connectToDatabase } from "@/lib/db";
+import { env } from "@/lib/env";
 import { categories, farmers, orders, products, reviewsByProduct, users } from "@/lib/mock-data";
-import type { DemoUser, FarmerProfile, Order, Product } from "@/lib/types";
+import type { Category, DemoUser, FarmerProfile, Order, Product } from "@/lib/types";
+import { CategoryModel } from "@/models/Category";
+import { FarmerModel } from "@/models/Farmer";
+import { ProductModel } from "@/models/Product";
+import { UserModel } from "@/models/User";
+import { ensureSeedData } from "@/lib/services/seed";
 
 export type ProductFilters = {
   search?: string;
@@ -11,82 +17,204 @@ export type ProductFilters = {
   sort?: string;
 };
 
-export async function getCategories() {
-  return categories;
+function hasDatabase() {
+  return Boolean(env.mongodbUri);
 }
 
-export async function getFarmers() {
-  return farmers;
+type ProductRecord = Product & {
+  harvestDate: string | Date;
+};
+
+type FarmerRecord = FarmerProfile;
+type CategoryRecord = Category;
+type UserRecord = DemoUser;
+
+function normalizeProduct(product: ProductRecord): Product {
+  return {
+    ...product,
+    harvestDate:
+      typeof product.harvestDate === "string"
+        ? product.harvestDate
+        : new Date(product.harvestDate).toISOString(),
+  };
 }
 
-export async function getProducts(filters: ProductFilters = {}) {
+function normalizeFarmer(farmer: FarmerRecord): FarmerProfile {
+  return {
+    ...farmer,
+  };
+}
+
+function normalizeCategory(category: CategoryRecord): Category {
+  return {
+    ...category,
+  };
+}
+
+function normalizeUser(user: UserRecord): DemoUser {
+  return {
+    ...user,
+  };
+}
+
+function sortProducts(list: Product[], sort?: string) {
+  const sorted = [...list];
+
+  switch (sort) {
+    case "price-asc":
+      sorted.sort((a, b) => a.price - b.price);
+      break;
+    case "price-desc":
+      sorted.sort((a, b) => b.price - a.price);
+      break;
+    case "popularity":
+      sorted.sort((a, b) => b.reviewCount - a.reviewCount);
+      break;
+    default:
+      sorted.sort((a, b) => Number(Boolean(b.trending)) - Number(Boolean(a.trending)));
+      break;
+  }
+
+  return sorted;
+}
+
+async function getMongoProducts(filters: ProductFilters = {}) {
   await connectToDatabase();
+  await ensureSeedData();
 
-  let filtered = [...products];
+  const query: Record<string, unknown> = {};
 
   if (filters.search) {
-    const query = filters.search.toLowerCase();
-    filtered = filtered.filter(
-      (product) =>
-        product.name.toLowerCase().includes(query) ||
-        product.tags.some((tag) => tag.toLowerCase().includes(query)) ||
-        product.farmerName.toLowerCase().includes(query),
-    );
+    query.$or = [
+      { name: { $regex: filters.search, $options: "i" } },
+      { farmerName: { $regex: filters.search, $options: "i" } },
+      { tags: { $elemMatch: { $regex: filters.search, $options: "i" } } },
+    ];
   }
 
   if (filters.category) {
-    filtered = filtered.filter((product) => product.category === filters.category);
+    query.category = filters.category;
   }
 
   if (filters.state) {
-    filtered = filtered.filter((product) => product.state === filters.state);
+    query.state = filters.state;
   }
 
   if (filters.organic) {
-    const organic = filters.organic === "true";
-    filtered = filtered.filter((product) => product.organic === organic);
+    query.organic = filters.organic === "true";
   }
 
   if (filters.rating) {
-    filtered = filtered.filter((product) => product.rating >= Number(filters.rating));
+    query.rating = { $gte: Number(filters.rating) };
   }
 
-  switch (filters.sort) {
-    case "price-asc":
-      filtered.sort((a, b) => a.price - b.price);
-      break;
-    case "price-desc":
-      filtered.sort((a, b) => b.price - a.price);
-      break;
-    case "popularity":
-      filtered.sort((a, b) => b.reviewCount - a.reviewCount);
-      break;
-    default:
-      filtered.sort((a, b) => Number(Boolean(b.trending)) - Number(Boolean(a.trending)));
-      break;
+  const mongoProducts = (await ProductModel.find(query).lean()) as ProductRecord[];
+  return sortProducts(mongoProducts.map(normalizeProduct), filters.sort);
+}
+
+async function getMongoCategories() {
+  await connectToDatabase();
+  await ensureSeedData();
+  const mongoCategories = (await CategoryModel.find().sort({ name: 1 }).lean()) as CategoryRecord[];
+  return mongoCategories.map(normalizeCategory);
+}
+
+async function getMongoFarmers() {
+  await connectToDatabase();
+  await ensureSeedData();
+  const mongoFarmers = (await FarmerModel.find().lean()) as FarmerRecord[];
+  return mongoFarmers.map(normalizeFarmer);
+}
+
+export async function getCategories() {
+  if (!hasDatabase()) {
+    return categories;
   }
 
-  return filtered;
+  return getMongoCategories();
+}
+
+export async function getFarmers() {
+  if (!hasDatabase()) {
+    return farmers;
+  }
+
+  return getMongoFarmers();
+}
+
+export async function getProducts(filters: ProductFilters = {}) {
+  if (!hasDatabase()) {
+    let filtered = [...products];
+
+    if (filters.search) {
+      const query = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query) ||
+          product.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+          product.farmerName.toLowerCase().includes(query),
+      );
+    }
+
+    if (filters.category) {
+      filtered = filtered.filter((product) => product.category === filters.category);
+    }
+
+    if (filters.state) {
+      filtered = filtered.filter((product) => product.state === filters.state);
+    }
+
+    if (filters.organic) {
+      const organic = filters.organic === "true";
+      filtered = filtered.filter((product) => product.organic === organic);
+    }
+
+    if (filters.rating) {
+      filtered = filtered.filter((product) => product.rating >= Number(filters.rating));
+    }
+
+    return sortProducts(filtered, filters.sort);
+  }
+
+  return getMongoProducts(filters);
 }
 
 export async function getFeaturedProducts() {
-  return products.filter((product) => product.featured);
+  return (await getProducts()).filter((product) => product.featured);
 }
 
 export async function getTrendingProducts() {
-  return products.filter((product) => product.trending);
+  return (await getProducts()).filter((product) => product.trending);
 }
 
 export async function getProductBySlug(slug: string) {
-  return products.find((product) => product.slug === slug);
+  if (!hasDatabase()) {
+    return products.find((product) => product.slug === slug);
+  }
+
+  await connectToDatabase();
+  await ensureSeedData();
+
+  const mongoProduct = (await ProductModel.findOne({ slug }).lean()) as ProductRecord | null;
+  return mongoProduct ? normalizeProduct(mongoProduct) : undefined;
 }
 
 export async function getProductById(id: string) {
-  return products.find((product) => product.id === id);
+  if (!hasDatabase()) {
+    return products.find((product) => product.id === id);
+  }
+
+  await connectToDatabase();
+  await ensureSeedData();
+
+  const mongoProduct = (await ProductModel.findOne({ id }).lean()) as ProductRecord | null;
+  return mongoProduct ? normalizeProduct(mongoProduct) : undefined;
 }
 
 export async function getRelatedProducts(product: Product) {
-  return products
+  const catalog = await getProducts();
+
+  return catalog
     .filter(
       (candidate) =>
         candidate.id !== product.id &&
@@ -105,7 +233,7 @@ export async function searchSuggestions(query: string) {
   }
 
   const lowered = query.toLowerCase();
-  return products
+  return (await getProducts({ search: query }))
     .filter(
       (product) =>
         product.name.toLowerCase().includes(lowered) ||
@@ -123,11 +251,22 @@ export async function searchSuggestions(query: string) {
 }
 
 export async function getStates() {
-  return Array.from(new Set(products.map((product) => product.state)));
+  return Array.from(new Set((await getProducts()).map((product) => product.state))).sort();
 }
 
 export async function getUserByEmail(email: string): Promise<DemoUser | undefined> {
-  return users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+  if (!hasDatabase()) {
+    return users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+  }
+
+  await connectToDatabase();
+  await ensureSeedData();
+
+  const mongoUser = (await UserModel.findOne({
+    email: { $regex: `^${email}$`, $options: "i" },
+  }).lean()) as UserRecord | null;
+
+  return mongoUser ? normalizeUser(mongoUser) : undefined;
 }
 
 export async function getUserOrders(userId: string): Promise<Order[]> {
@@ -135,9 +274,25 @@ export async function getUserOrders(userId: string): Promise<Order[]> {
 }
 
 export async function getFarmerById(farmerId: string): Promise<FarmerProfile | undefined> {
-  return farmers.find((farmer) => farmer.id === farmerId);
+  if (!hasDatabase()) {
+    return farmers.find((farmer) => farmer.id === farmerId);
+  }
+
+  await connectToDatabase();
+  await ensureSeedData();
+
+  const mongoFarmer = (await FarmerModel.findOne({ id: farmerId }).lean()) as FarmerRecord | null;
+  return mongoFarmer ? normalizeFarmer(mongoFarmer) : undefined;
 }
 
 export async function getFarmerProducts(farmerId: string): Promise<Product[]> {
-  return products.filter((product) => product.farmerId === farmerId);
+  if (!hasDatabase()) {
+    return products.filter((product) => product.farmerId === farmerId);
+  }
+
+  await connectToDatabase();
+  await ensureSeedData();
+
+  const mongoProducts = (await ProductModel.find({ farmerId }).sort({ createdAt: -1 }).lean()) as ProductRecord[];
+  return mongoProducts.map(normalizeProduct);
 }

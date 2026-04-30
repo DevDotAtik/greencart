@@ -64,8 +64,21 @@ export default function LoginPage() {
     }
 
     setMessage(data.message ?? "Registration complete. You can now sign in.");
-    setMode("login");
+    const loginResult = await signIn("credentials", {
+      email: form.email,
+      password: form.password,
+      redirect: false,
+    });
+
     setLoading(false);
+
+    if (loginResult?.error) {
+      setMode("login");
+      return;
+    }
+
+    router.push("/account");
+    router.refresh();
   }
 
   return (
@@ -76,12 +89,11 @@ export default function LoginPage() {
           <section className="surface-card p-8">
             <span className="tag-pill">Auth</span>
             <h1 className="mt-6 font-serif text-5xl font-bold leading-tight">
-              Buyer and farmer access in one place.
+              Buyer and farmer access in one simple place.
             </h1>
             <p className="mt-4 max-w-lg text-base leading-7 text-ink-600">
-              Use demo credentials for quick testing, or register a new account.
-              Passwords are validated and server-side hashing is enabled in the
-              registration API flow.
+              Use demo credentials for quick testing, or register a new Mongo-backed account.
+              New registrations are saved to the database and can sign in immediately.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {Object.entries(DEMO_CREDENTIALS).map(([demoRole, values]) => (
@@ -95,7 +107,7 @@ export default function LoginPage() {
                       password: values.password,
                     }))
                   }
-                  className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left"
+                  className="rounded-2xl border border-brand-100 bg-brand-50/60 p-4 text-left"
                 >
                   <p className="font-bold capitalize">{demoRole}</p>
                   <p className="mt-2 text-xs text-ink-500">{values.email}</p>
@@ -109,8 +121,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setMode("login")}
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                  mode === "login" ? "bg-brand-500 text-white" : "bg-slate-100 text-ink-600"
+                className={`rounded-xl px-4 py-2 text-sm font-semibold ${
+                  mode === "login" ? "bg-brand-600 text-white" : "bg-brand-50 text-ink-600"
                 }`}
               >
                 Login
@@ -118,8 +130,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setMode("register")}
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                  mode === "register" ? "bg-brand-500 text-white" : "bg-slate-100 text-ink-600"
+                className={`rounded-xl px-4 py-2 text-sm font-semibold ${
+                  mode === "register" ? "bg-brand-600 text-white" : "bg-brand-50 text-ink-600"
                 }`}
               >
                 Register
@@ -162,8 +174,8 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setRole("buyer")}
-                    className={`rounded-3xl border p-4 text-left ${
-                      role === "buyer" ? "border-brand-300 bg-brand-50" : "border-slate-200"
+                    className={`rounded-2xl border p-4 text-left ${
+                      role === "buyer" ? "border-brand-300 bg-brand-50" : "border-brand-100"
                     }`}
                   >
                     <p className="font-bold">Buyer account</p>
@@ -172,8 +184,8 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setRole("farmer")}
-                    className={`rounded-3xl border p-4 text-left ${
-                      role === "farmer" ? "border-brand-300 bg-brand-50" : "border-slate-200"
+                    className={`rounded-2xl border p-4 text-left ${
+                      role === "farmer" ? "border-brand-300 bg-brand-50" : "border-brand-100"
                     }`}
                   >
                     <p className="font-bold">Farmer account</p>

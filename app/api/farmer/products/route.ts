@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/db";
 import { getFarmerProducts } from "@/lib/services/catalog";
 import { farmerProductSchema } from "@/lib/schemas";
+import { ensureSeedData } from "@/lib/services/seed";
+import { ProductModel } from "@/models/Product";
+import { slugify } from "@/utils/format";
 
-export async function GET() {
-  const products = await getFarmerProducts("farmer-1");
+const DEFAULT_FARMER_ID = "farmer-1";
+const DEFAULT_FARMER_NAME = "Rakesh Kumar";
+
+export async function GET(request: NextRequest) {
+  const farmerId = request.nextUrl.searchParams.get("farmerId") ?? DEFAULT_FARMER_ID;
+  const products = await getFarmerProducts(farmerId);
   return NextResponse.json({ products });
 }
 
@@ -18,10 +26,61 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const connection = await connectToDatabase();
+
+  if (!connection) {
+    return NextResponse.json(
+      { error: "MongoDB is not configured. Add MONGODB_URI to enable product creation." },
+      { status: 500 },
+    );
+  }
+
+  await ensureSeedData();
+
+  const baseSlug = slugify(parsed.data.name);
+  let slug = baseSlug;
+  let suffix = 1;
+
+  while (await ProductModel.exists({ slug })) {
+    suffix += 1;
+    slug = `${baseSlug}-${suffix}`;
+  }
+
+  const product = await ProductModel.create({
+    id: `prod-${Date.now().toString(36)}`,
+    slug,
+    name: parsed.data.name,
+    farmerId: parsed.data.farmerId ?? DEFAULT_FARMER_ID,
+    farmerName: parsed.data.farmerName ?? DEFAULT_FARMER_NAME,
+    category: parsed.data.category,
+    state: parsed.data.state,
+    description: parsed.data.description,
+    tags: parsed.data.tags ?? ["New arrival"],
+    unit: parsed.data.unit,
+    stock: parsed.data.stock,
+    organic: parsed.data.organic,
+    price: parsed.data.price,
+    originalPrice: parsed.data.originalPrice,
+    deliveryTime: parsed.data.deliveryTime ?? "2-4 days",
+    rating: 0,
+    reviewCount: 0,
+    images:
+      parsed.data.images ?? [
+        "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1200&q=80",
+      ],
+    color: parsed.data.organic ? "from-green-100 to-emerald-50" : "from-lime-100 to-white",
+    harvestDate: new Date(),
+    featured: false,
+    trending: true,
+  });
+
   return NextResponse.json(
     {
-      message: "Product accepted by the farmer API. Persist it to MongoDB in production.",
-      product: parsed.data,
+      message: "Product added to GreenCart successfully.",
+      product: {
+        ...product.toObject(),
+        harvestDate: product.harvestDate?.toISOString?.() ?? new Date().toISOString(),
+      },
     },
     { status: 201 },
   );
