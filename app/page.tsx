@@ -74,52 +74,52 @@ export default async function HomePage() {
     <>
       <Navbar />
       <main className="pb-8">
-        <section className="shell pt-8">
-          <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-            <div className="surface-card p-6 sm:p-8">
-              <span className="tag-pill">GreenCart marketplace</span>
-              <h1 className="mt-6 max-w-xl text-4xl font-black leading-tight text-emerald-950 sm:text-5xl">
-                Fresh produce and agri supplies with a cleaner, wider storefront.
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-7 text-ink-600">
-                GreenCart now uses a lighter green-and-white theme, sharper cards, real Mongo-backed
-                registration, and farmer product creation for a simpler farm commerce experience.
-              </p>
+        <section className="pt-6">
+          <HeroSlideshow />
+        </section>
 
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/products" className="primary-button">
-                  Explore products
-                </Link>
-                <Link href="/sell-on-greencart" className="secondary-button">
-                  Sell on GreenCart
-                </Link>
-              </div>
+        <section className="shell -mt-12 relative z-10">
+          <div className="surface-card p-6 sm:p-8">
+            <span className="tag-pill">GreenCart marketplace</span>
+            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight text-emerald-950 sm:text-5xl">
+              Fresh produce and agri supplies with a cleaner, wider storefront.
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-ink-600">
+              GreenCart now uses a lighter green-and-white theme, sharper cards, real Mongo-backed
+              registration, and farmer product creation for a simpler farm commerce experience.
+            </p>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {benefitCards.map((card) => {
-                  const Icon = card.icon;
-
-                  return (
-                    <div key={card.title} className="rounded-2xl border border-brand-100 bg-brand-50/50 p-4">
-                      <Icon className="h-5 w-5 text-brand-700" />
-                      <p className="mt-3 text-lg font-bold text-emerald-950">{card.title}</p>
-                      <p className="mt-2 text-sm leading-6 text-ink-600">{card.copy}</p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {homeData.stats.map((stat) => (
-                  <div key={stat.label} className="rounded-2xl border border-brand-100 bg-white p-4">
-                    <p className="text-2xl font-extrabold text-emerald-950">{stat.value}</p>
-                    <p className="mt-1 text-sm text-ink-500">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/products" className="primary-button">
+                Explore products
+              </Link>
+              <Link href="/sell-on-greencart" className="secondary-button">
+                Sell on GreenCart
+              </Link>
             </div>
 
-            <HeroSlideshow />
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {benefitCards.map((card) => {
+                const Icon = card.icon;
+
+                return (
+                  <div key={card.title} className="rounded-2xl border border-brand-100 bg-brand-50/60 p-4">
+                    <Icon className="h-5 w-5 text-brand-700" />
+                    <p className="mt-3 text-lg font-bold text-emerald-950">{card.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-ink-600">{card.copy}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {homeData.stats.map((stat) => (
+                <div key={stat.label} className="rounded-2xl border border-brand-100 bg-white p-4">
+                  <p className="text-2xl font-extrabold text-emerald-950">{stat.value}</p>
+                  <p className="mt-1 text-sm text-ink-500">{stat.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 

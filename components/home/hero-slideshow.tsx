@@ -41,8 +41,8 @@ export function HeroSlideshow() {
   }, []);
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-card">
-      <div className="relative h-[380px] sm:h-[460px] xl:h-[520px]">
+    <section className="overflow-hidden border-y border-brand-100 bg-white">
+      <div className="relative h-[420px] sm:h-[560px] xl:h-[680px]">
         {slides.map((slide, index) => (
           <div
             key={slide.title}
@@ -56,27 +56,29 @@ export function HeroSlideshow() {
               alt={slide.title}
               fill
               priority={index === 0}
-              sizes="(max-width: 1280px) 100vw, 56vw"
+              sizes="100vw"
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/65 via-emerald-950/20 to-transparent" />
           </div>
         ))}
 
-        <div className="absolute left-5 top-5 rounded-xl bg-white/92 px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-emerald-950">
+        <div className="absolute left-5 top-5 rounded-xl bg-white/92 px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-emerald-950 sm:left-8 sm:top-8">
           Featured Banner
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8">
-          <p className="max-w-2xl text-3xl font-black leading-tight sm:text-4xl xl:text-5xl">
+        <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-8 xl:p-12">
+          <div className="shell px-0 sm:px-0">
+          <p className="max-w-3xl text-3xl font-black leading-tight sm:text-5xl xl:text-6xl">
             {slides[activeIndex].title}
           </p>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/90 sm:text-base">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/90 sm:text-lg">
             {slides[activeIndex].subtitle}
           </p>
+          </div>
         </div>
 
-        <div className="absolute right-5 top-5 flex gap-2">
+        <div className="absolute right-5 top-5 flex gap-2 sm:right-8 sm:top-8">
           <button
             type="button"
             onClick={() => setActiveIndex((activeIndex - 1 + slides.length) % slides.length)}

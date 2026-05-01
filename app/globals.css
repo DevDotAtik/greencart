@@ -13,9 +13,10 @@ html {
 body {
   @apply bg-white text-ink-900;
   background-image:
-    radial-gradient(circle at top left, rgba(47, 161, 67, 0.1), transparent 24%),
-    radial-gradient(circle at top right, rgba(152, 230, 173, 0.18), transparent 26%),
-    linear-gradient(180deg, #f7fff7 0%, #ffffff 24%, #fbfefb 100%);
+    radial-gradient(circle at top left, rgba(47, 161, 67, 0.16), transparent 25%),
+    radial-gradient(circle at top right, rgba(120, 214, 146, 0.24), transparent 28%),
+    radial-gradient(circle at center top, rgba(197, 244, 205, 0.35), transparent 34%),
+    linear-gradient(180deg, #effbef 0%, #f8fff7 18%, #ffffff 42%, #f5fcf3 100%);
 }
 
 a,
