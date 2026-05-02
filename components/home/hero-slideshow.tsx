@@ -11,7 +11,7 @@ const slides = [
       "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80",
     title: "Fresh farm produce and agri inputs in one wide, simple storefront",
     subtitle:
-      "Shop fruits, vegetables, seeds, pesticides and fertilisers with a cleaner GreenCart experience.",
+      "Shop fruits, vegetables, seeds, pesticides and fertilisers with a cleaner Krishi Bazaar experience.",
   },
   {
     image:

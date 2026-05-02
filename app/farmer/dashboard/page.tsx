@@ -33,7 +33,7 @@ export default async function FarmerDashboardPage() {
             </p>
           </div>
           <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-700">
-            New products added here are saved to your GreenCart catalog.
+            New products added here are saved to your Krishi Bazaar catalog.
           </div>
         </div>
 

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeIndianRupee,
   CloudSun,
   PackagePlus,
   ShieldCheck,
@@ -19,8 +18,8 @@ import {
   getFeaturedProducts,
   getTrendingProducts,
 } from "@/lib/services/catalog";
+import { MandiRatesPanel } from "@/components/home/mandi-rates-panel";
 import { getCropInsights, getHomePageData } from "@/lib/services/dashboard";
-import { formatCurrency } from "@/utils/format";
 
 const categoryVisuals: Record<string, string> = {
   fruits:
@@ -80,12 +79,12 @@ export default async function HomePage() {
 
         <section className="shell -mt-12 relative z-10">
           <div className="surface-card p-6 sm:p-8">
-            <span className="tag-pill">GreenCart marketplace</span>
+            <span className="tag-pill">Krishi Bazaar marketplace</span>
             <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight text-emerald-950 sm:text-5xl">
               Fresh produce and agri supplies with a cleaner, wider storefront.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-ink-600">
-              GreenCart now uses a lighter green-and-white theme, sharper cards, real Mongo-backed
+              Krishi Bazaar now uses a lighter green-and-white theme, sharper cards, real Mongo-backed
               registration, and farmer product creation for a simpler farm commerce experience.
             </p>
 
@@ -94,7 +93,7 @@ export default async function HomePage() {
                 Explore products
               </Link>
               <Link href="/sell-on-greencart" className="secondary-button">
-                Sell on GreenCart
+                Sell on Krishi Bazaar
               </Link>
             </div>
 
@@ -205,23 +204,7 @@ export default async function HomePage() {
 
         <section className="shell mt-16">
           <div className="grid gap-6 xl:grid-cols-[1fr_1fr_1fr]">
-            <div className="surface-card p-6">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-xl font-extrabold text-emerald-950">Government mandi prices</p>
-                <BadgeIndianRupee className="h-5 w-5 text-brand-700" />
-              </div>
-              <div className="mt-5 space-y-3">
-                {homeData.mandiRates.slice(0, 3).map((rate) => (
-                  <div key={`${rate.commodity}-${rate.market}`} className="rounded-2xl border border-brand-100 p-4">
-                    <p className="font-bold">{rate.commodity}</p>
-                    <p className="mt-1 text-sm text-ink-500">
-                      {rate.market}, {rate.state}
-                    </p>
-                    <p className="mt-3 text-lg font-extrabold">{formatCurrency(rate.modalPrice / 100)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <MandiRatesPanel rates={homeData.mandiRates} />
 
             <div className="surface-card p-6">
               <p className="text-xl font-extrabold text-emerald-950">Quick crop info</p>

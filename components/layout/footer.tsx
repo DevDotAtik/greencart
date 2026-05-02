@@ -5,7 +5,7 @@ const footerGroups = [
     title: "Marketplace",
     links: [
       { href: "/products", label: "All products" },
-      { href: "/sell-on-greencart", label: "Sell on GreenCart" },
+      { href: "/sell-on-greencart", label: "Sell on Krishi Bazaar" },
       { href: "/farmer/dashboard", label: "Seller dashboard" },
     ],
   },
@@ -34,7 +34,7 @@ export function Footer() {
         <div className="space-y-4">
           <p className="font-serif text-3xl font-bold">Simple farm commerce for everyday buying and agri supply.</p>
           <p className="max-w-md text-sm leading-6 text-ink-600">
-            GreenCart helps farmers sell produce and agri inputs directly while buyers, retailers,
+            Krishi Bazaar helps farmers sell produce and agri inputs directly while buyers, retailers,
             and bulk teams source from one cleaner marketplace.
           </p>
         </div>

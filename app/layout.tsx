@@ -16,8 +16,8 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL("https://greencart.vercel.app"),
   title: {
-    default: "GreenCart | Direct Farmer Marketplace",
-    template: "%s | GreenCart",
+    default: "Krishi Bazaar | Direct Farmer Marketplace",
+    template: "%s | Krishi Bazaar",
   },
   description:
     "A full-stack farmer marketplace where growers sell directly to households, wholesalers, and retailers with live mandi and crop insights.",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     "next.js marketplace",
   ],
   openGraph: {
-    title: "GreenCart | Direct Farmer Marketplace",
+    title: "Krishi Bazaar | Direct Farmer Marketplace",
     description:
       "Buy fresh produce, grains, dairy, seeds, and organic staples directly from verified Indian farmers.",
     type: "website",

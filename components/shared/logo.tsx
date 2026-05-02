@@ -8,7 +8,7 @@ export function Logo() {
         <Leaf className="h-5 w-5" />
       </span>
       <span>
-        <span className="block text-lg font-extrabold tracking-tight">GreenCart</span>
+        <span className="block text-lg font-extrabold tracking-tight">Krishi Bazaar</span>
         <span className="block text-xs text-ink-500">Direct farmer marketplace</span>
       </span>
     </Link>

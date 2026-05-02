@@ -29,7 +29,7 @@ export default function ContactUsPage() {
         <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
           <div className="surface-card bg-brand-50/70 p-8">
             <span className="tag-pill">Contact Us</span>
-            <h1 className="mt-5 text-4xl font-extrabold text-emerald-950">Reach the GreenCart team for support, partnerships and onboarding.</h1>
+            <h1 className="mt-5 text-4xl font-extrabold text-emerald-950">Reach the Krishi Bazaar team for support, partnerships and onboarding.</h1>
             <p className="mt-4 text-base leading-7 text-ink-600">
               Use this page for general questions about orders, seller activation, supply partnerships or product support.
             </p>

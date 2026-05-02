@@ -29,7 +29,7 @@ async function fetchDataGovResource(resourceId: string, limit = 10) {
 export const getMandiRates = unstable_cache(
   async (): Promise<MandiRate[]> => {
     try {
-      const data = await fetchDataGovResource(env.mandiResourceId, 8);
+      const data = await fetchDataGovResource(env.mandiResourceId, 40);
       const records = data?.records ?? [];
 
       if (!records.length) {

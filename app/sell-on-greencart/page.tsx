@@ -6,7 +6,7 @@ import { Navbar } from "@/components/layout/navbar";
 const sellerBenefits = [
   "Create your farmer profile and list products quickly.",
   "Sell fruits, vegetables, grains, dairy and agri inputs.",
-  "Use the GreenCart dashboard to add products into the live catalog.",
+  "Use the Krishi Bazaar dashboard to add products into the live catalog.",
 ];
 
 export default function SellOnGreenCartPage() {
@@ -16,10 +16,10 @@ export default function SellOnGreenCartPage() {
       <main className="shell py-10">
         <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
           <div className="surface-card bg-brand-50/70 p-8">
-            <span className="tag-pill">Sell on GreenCart</span>
+            <span className="tag-pill">Sell on Krishi Bazaar</span>
             <h1 className="mt-5 text-4xl font-extrabold text-emerald-950">Grow your farm business with a cleaner online storefront.</h1>
             <p className="mt-4 text-base leading-7 text-ink-600">
-              Join GreenCart to sell produce, staples and agri inputs directly to retail and bulk buyers.
+              Join Krishi Bazaar to sell produce, staples and agri inputs directly to retail and bulk buyers.
             </p>
 
             <div className="mt-8 space-y-4">

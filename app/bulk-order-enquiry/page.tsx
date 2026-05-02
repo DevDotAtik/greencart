@@ -31,7 +31,7 @@ export default function BulkOrderEnquiryPage() {
             <span className="tag-pill">Bulk Order Enquiry</span>
             <h1 className="mt-5 text-4xl font-extrabold text-emerald-950">Send large-volume product or agri input requirements.</h1>
             <p className="mt-4 text-base leading-7 text-ink-600">
-              GreenCart can support bulk fresh produce buying as well as crop input sourcing for farms and businesses.
+              Krishi Bazaar can support bulk fresh produce buying as well as crop input sourcing for farms and businesses.
             </p>
 
             <div className="mt-8 grid gap-4">
