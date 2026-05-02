@@ -55,6 +55,9 @@ export function AccountOverview() {
         <div className="surface-card p-6">
           <p className="text-xl font-extrabold">Quick links</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <Link href="/auctions" className="secondary-button rounded-2xl">
+              Live auctions
+            </Link>
             <Link href="/orders" className="secondary-button rounded-2xl">
               My orders
             </Link>

@@ -1,7 +1,16 @@
 import cors from "cors";
 import express from "express";
+import { createAuctionSchema, placeBidSchema } from "@/lib/schemas";
 import { getMandiRates, getWeatherInsights } from "@/lib/datagov";
 import { orders } from "@/lib/mock-data";
+import {
+  AuctionError,
+  createAuction,
+  getActiveAuctions,
+  getAuctionById,
+  getBidHistory,
+  placeBid,
+} from "@/lib/services/auctions";
 import { getProducts, searchSuggestions } from "@/lib/services/catalog";
 import { createOrder } from "@/lib/services/orders";
 
@@ -54,6 +63,96 @@ app.get("/orders", (_request, response) => {
 app.post("/orders", (request, response) => {
   const order = createOrder(request.body);
   response.status(201).json({ order });
+});
+
+app.get("/auctions", async (_request, response) => {
+  const auctions = await getActiveAuctions();
+  response.json({ auctions });
+});
+
+app.get("/auctions/:id", async (request, response) => {
+  const auction = await getAuctionById(request.params.id);
+
+  if (!auction) {
+    response.status(404).json({ error: "Auction not found." });
+    return;
+  }
+
+  response.json({ auction });
+});
+
+app.get("/auctions/:id/bids", async (request, response) => {
+  try {
+    const bids = await getBidHistory(request.params.id);
+    response.json({ bids });
+  } catch (error) {
+    if (error instanceof AuctionError) {
+      response.status(error.statusCode).json({ error: error.message, code: error.code });
+      return;
+    }
+
+    response.status(500).json({ error: "Unable to load bid history." });
+  }
+});
+
+app.post("/auctions", async (request, response) => {
+  const parsed = createAuctionSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    response.status(400).json({ error: "Invalid auction payload.", issues: parsed.error.flatten() });
+    return;
+  }
+
+  try {
+    const auction = await createAuction({
+      sellerUserId: String(request.body.sellerUserId ?? ""),
+      sellerFarmerId: typeof request.body.sellerFarmerId === "string" ? request.body.sellerFarmerId : undefined,
+      sellerName: String(request.body.sellerName ?? "Farmer"),
+      productName: parsed.data.productName,
+      description: parsed.data.description,
+      quantity: parsed.data.quantity,
+      basePrice: parsed.data.basePrice,
+      bidIncrement: parsed.data.bidIncrement,
+      auctionEndTime: parsed.data.auctionEndTime,
+    });
+
+    response.status(201).json({ auction });
+  } catch (error) {
+    if (error instanceof AuctionError) {
+      response.status(error.statusCode).json({ error: error.message, code: error.code, details: error.details });
+      return;
+    }
+
+    response.status(500).json({ error: "Unable to create auction." });
+  }
+});
+
+app.post("/auctions/:id/bids", async (request, response) => {
+  const parsed = placeBidSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    response.status(400).json({ error: "Invalid bid payload.", issues: parsed.error.flatten() });
+    return;
+  }
+
+  try {
+    const auction = await placeBid({
+      auctionId: request.params.id,
+      bidderUserId: String(request.body.bidderUserId ?? ""),
+      bidderName: String(request.body.bidderName ?? "Buyer"),
+      amount: parsed.data.amount,
+      role: request.body.role === "admin" ? "admin" : "buyer",
+    });
+
+    response.status(201).json({ auction });
+  } catch (error) {
+    if (error instanceof AuctionError) {
+      response.status(error.statusCode).json({ error: error.message, code: error.code, details: error.details });
+      return;
+    }
+
+    response.status(500).json({ error: "Unable to place bid." });
+  }
 });
 
 const port = Number(process.env.EXPRESS_PORT ?? 4000);

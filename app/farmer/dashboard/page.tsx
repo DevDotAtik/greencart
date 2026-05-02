@@ -1,14 +1,23 @@
+import { getServerSession } from "next-auth";
+import { FarmerAuctionManager } from "@/components/dashboard/farmer-auction-manager";
 import { FarmerProductManager } from "@/components/dashboard/farmer-product-manager";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { authOptions } from "@/lib/auth";
+import { getSellerAuctions } from "@/lib/services/auctions";
 import { getFarmerProducts } from "@/lib/services/catalog";
 import { getFarmerDashboardData } from "@/lib/services/dashboard";
 
 export default async function FarmerDashboardPage() {
-  const [dashboardData, farmerProducts] = await Promise.all([
+  const session = await getServerSession(authOptions);
+  const farmerId = session?.user?.farmerId ?? "farmer-1";
+  const sellerUserId = session?.user?.id ?? "user-2";
+
+  const [dashboardData, farmerProducts, sellerAuctions] = await Promise.all([
     getFarmerDashboardData(),
-    getFarmerProducts("farmer-1"),
+    getFarmerProducts(farmerId),
+    getSellerAuctions(sellerUserId),
   ]);
 
   return (
@@ -34,8 +43,9 @@ export default async function FarmerDashboardPage() {
           ))}
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="mt-10 grid gap-8 xl:grid-cols-[1fr_1fr_0.9fr]">
           <FarmerProductManager initialProducts={farmerProducts} />
+          <FarmerAuctionManager initialAuctions={sellerAuctions} />
 
           <div className="space-y-8">
             <section className="surface-card p-6">

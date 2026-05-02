@@ -132,3 +132,36 @@ export type DashboardMetric = {
   change: string;
   tone: "positive" | "neutral" | "warning";
 };
+
+export type AuctionStatus = "active" | "ended";
+
+export type Auction = {
+  id: string;
+  sellerUserId: string;
+  sellerFarmerId?: string;
+  sellerName: string;
+  productName: string;
+  description: string;
+  quantity: string;
+  basePrice: number;
+  bidIncrement: number;
+  currentHighestBid: number | null;
+  highestBidderId?: string;
+  highestBidderName?: string;
+  winnerUserId?: string;
+  winnerName?: string;
+  endTime: string;
+  status: AuctionStatus;
+  bidCount: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type AuctionBid = {
+  id: string;
+  auctionId: string;
+  bidderUserId: string;
+  bidderName: string;
+  amount: number;
+  createdAt: string;
+};

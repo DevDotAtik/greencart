@@ -11,6 +11,7 @@ import { useI18n } from "@/hooks/use-i18n";
 const navItems = [
   { href: "/", key: "navHome" as const },
   { href: "/products", key: "navProducts" as const },
+  { href: "/auctions", key: "navAuctions" as const },
   { href: "/orders", key: "navOrders" as const },
   { href: "/account", key: "navAccount" as const },
 ];

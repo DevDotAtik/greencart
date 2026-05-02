@@ -54,3 +54,21 @@ export const enquirySchema = z.object({
   subject: z.string().min(2).optional(),
   requirement: z.string().min(10),
 });
+
+export const createAuctionSchema = z.object({
+  productName: z.string().min(2),
+  description: z.string().min(20),
+  quantity: z.string().min(1),
+  basePrice: z.coerce.number().positive(),
+  bidIncrement: z.coerce.number().positive(),
+  auctionEndTime: z
+    .string()
+    .min(1)
+    .refine((value) => !Number.isNaN(new Date(value).getTime()), {
+      message: "Auction end time must be a valid date and time.",
+    }),
+});
+
+export const placeBidSchema = z.object({
+  amount: z.number().positive(),
+});

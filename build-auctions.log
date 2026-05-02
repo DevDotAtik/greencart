@@ -1,0 +1,63 @@
+
+> greencart@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/28) ...
+   Generating static pages (7/28) 
+   Generating static pages (14/28) 
+   Generating static pages (21/28) 
+ ✓ Generating static pages (28/28)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    1.98 kB         127 kB
+├ ○ /_not-found                          142 B          87.5 kB
+├ ○ /account                             2.23 kB         131 kB
+├ ○ /admin                               3.27 kB         120 kB
+├ ○ /api/admin/overview                  0 B                0 B
+├ ƒ /api/auctions                        0 B                0 B
+├ ƒ /api/auctions/[id]                   0 B                0 B
+├ ƒ /api/auctions/[id]/bids              0 B                0 B
+├ ƒ /api/auth/[...nextauth]              0 B                0 B
+├ ƒ /api/enquiries                       0 B                0 B
+├ ƒ /api/farmer/products                 0 B                0 B
+├ ○ /api/market                          0 B                0 B
+├ ƒ /api/orders                          0 B                0 B
+├ ƒ /api/orders/[id]                     0 B                0 B
+├ ƒ /api/orders/[id]/invoice             0 B                0 B
+├ ƒ /api/products                        0 B                0 B
+├ ƒ /api/products/[id]                   0 B                0 B
+├ ƒ /api/search                          0 B                0 B
+├ ƒ /api/users/register                  0 B                0 B
+├ ○ /api/weather                         0 B                0 B
+├ ƒ /auctions                            3.28 kB         120 kB
+├ ƒ /auctions/[id]                       4.33 kB         121 kB
+├ ○ /bulk-order-enquiry                  140 B           120 kB
+├ ○ /cart                                2.74 kB         131 kB
+├ ○ /checkout                            2.32 kB         126 kB
+├ ○ /contact-us                          141 B           120 kB
+├ ƒ /farmer/dashboard                    6.61 kB         128 kB
+├ ○ /login                               5.02 kB         121 kB
+├ ○ /orders                              1.26 kB         125 kB
+├ ƒ /products                            213 B           126 kB
+├ ƒ /products/[slug]                     213 B           126 kB
+├ ○ /robots.txt                          0 B                0 B
+├ ○ /sell-on-greencart                   141 B           120 kB
+└ ○ /sitemap.xml                         0 B                0 B
++ First Load JS shared by all            87.3 kB
+  ├ chunks/117-2eba73dd79bce040.js       31.7 kB
+  ├ chunks/fd9d1056-99fd069f72f04521.js  53.6 kB
+  └ other shared chunks (total)          1.95 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

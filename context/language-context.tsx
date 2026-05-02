@@ -14,6 +14,7 @@ type Language = "en" | "hi";
 type Dictionary = {
   navHome: string;
   navProducts: string;
+  navAuctions: string;
   navOrders: string;
   navAccount: string;
   searchPlaceholder: string;
@@ -29,6 +30,7 @@ const dictionaries: Record<Language, Dictionary> = {
   en: {
     navHome: "Home",
     navProducts: "Products",
+    navAuctions: "Auctions",
     navOrders: "Orders",
     navAccount: "Account",
     searchPlaceholder: "Search fruits, vegetables, seeds, organic staples...",
@@ -43,6 +45,7 @@ const dictionaries: Record<Language, Dictionary> = {
   hi: {
     navHome: "होम",
     navProducts: "उत्पाद",
+    navAuctions: "नीलामी",
     navOrders: "ऑर्डर",
     navAccount: "अकाउंट",
     searchPlaceholder: "फल, सब्जियां, बीज, ऑर्गेनिक सामान खोजें...",
