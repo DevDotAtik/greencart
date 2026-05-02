@@ -58,6 +58,9 @@ export function AccountOverview() {
             <Link href="/auctions" className="secondary-button rounded-2xl">
               Live auctions
             </Link>
+            <Link href="/chat" className="secondary-button rounded-2xl">
+              Chat assistant
+            </Link>
             <Link href="/orders" className="secondary-button rounded-2xl">
               My orders
             </Link>

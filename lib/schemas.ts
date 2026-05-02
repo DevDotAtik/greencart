@@ -72,3 +72,8 @@ export const createAuctionSchema = z.object({
 export const placeBidSchema = z.object({
   amount: z.number().positive(),
 });
+
+export const chatRequestSchema = z.object({
+  sessionId: z.string().min(3),
+  message: z.string().min(1).max(1000),
+});

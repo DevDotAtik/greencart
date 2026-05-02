@@ -165,3 +165,14 @@ export type AuctionBid = {
   amount: number;
   createdAt: string;
 };
+
+export type ChatRole = "user" | "assistant";
+
+export type ChatMessage = {
+  id: string;
+  sessionId: string;
+  role: ChatRole;
+  content: string;
+  createdAt: string;
+  source?: "database" | "openai" | "faq" | "system";
+};

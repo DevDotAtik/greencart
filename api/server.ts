@@ -11,6 +11,7 @@ import {
   getBidHistory,
   placeBid,
 } from "@/lib/services/auctions";
+import { getChatHistory, processChatMessage } from "@/lib/services/chatbot";
 import { getProducts, searchSuggestions } from "@/lib/services/catalog";
 import { createOrder } from "@/lib/services/orders";
 
@@ -63,6 +64,40 @@ app.get("/orders", (_request, response) => {
 app.post("/orders", (request, response) => {
   const order = createOrder(request.body);
   response.status(201).json({ order });
+});
+
+app.get("/chat", async (request, response) => {
+  const sessionId =
+    typeof request.query.sessionId === "string" ? request.query.sessionId : "";
+  const messages = sessionId ? await getChatHistory(sessionId) : [];
+  response.json({ messages });
+});
+
+app.post("/chat", async (request, response) => {
+  const sessionId =
+    typeof request.body.sessionId === "string" ? request.body.sessionId : "";
+  const message =
+    typeof request.body.message === "string" ? request.body.message : "";
+
+  if (!sessionId || !message.trim()) {
+    response.status(400).json({ error: "sessionId and message are required." });
+    return;
+  }
+
+  const result = await processChatMessage({
+    sessionId,
+    message,
+    user: request.body.userId
+      ? {
+          id: String(request.body.userId),
+          name: typeof request.body.userName === "string" ? request.body.userName : "Website User",
+          email: typeof request.body.userEmail === "string" ? request.body.userEmail : null,
+          role: request.body.role === "farmer" || request.body.role === "admin" ? request.body.role : "buyer",
+        }
+      : undefined,
+  });
+
+  response.status(201).json(result);
 });
 
 app.get("/auctions", async (_request, response) => {

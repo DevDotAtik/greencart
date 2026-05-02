@@ -12,6 +12,7 @@ const footerGroups = [
   {
     title: "Support",
     links: [
+      { href: "/chat", label: "Chat Assistant" },
       { href: "/bulk-order-enquiry", label: "Bulk Order Enquiry" },
       { href: "/contact-us", label: "Contact Us" },
       { href: "/orders", label: "Orders" },
