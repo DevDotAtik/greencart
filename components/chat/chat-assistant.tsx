@@ -75,6 +75,7 @@ export function ChatAssistant({ onClose, variant = "page" }: ChatAssistantProps)
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typing, setTyping] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
   const [pageContext, setPageContext] = useState<ChatPageContext | null>(null);
@@ -199,6 +200,36 @@ export function ChatAssistant({ onClose, variant = "page" }: ChatAssistantProps)
     }
   }
 
+  async function clearAllChats() {
+    if (!sessionId) {
+      return;
+    }
+
+    setClearing(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/chat?sessionId=${encodeURIComponent(sessionId)}`, {
+        method: "DELETE",
+      });
+
+      const data = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        setError(data.error ?? "Unable to delete chat history right now.");
+        setClearing(false);
+        return;
+      }
+
+      setMessages([]);
+      setMessage("");
+    } catch {
+      setError("Unable to delete chat history right now.");
+    } finally {
+      setClearing(false);
+    }
+  }
+
   return (
     <div className="surface-card overflow-hidden shadow-xl">
       <div className="border-b border-brand-100 bg-brand-50/70 px-5 py-4">
@@ -212,16 +243,26 @@ export function ChatAssistant({ onClose, variant = "page" }: ChatAssistantProps)
               Viewing {pageContext?.pageTitle ?? getFallbackPageTitle(pathname)}
             </p>
           </div>
-          {onClose ? (
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={onClose}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-100 bg-white text-ink-600 hover:border-brand-300 hover:text-brand-700"
-              aria-label="Close assistant"
+              onClick={() => void clearAllChats()}
+              disabled={clearing || loadingHistory}
+              className="rounded-xl border border-brand-100 bg-white px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <X className="h-4 w-4" />
+              {clearing ? "Deleting..." : "Delete all chats"}
             </button>
-          ) : null}
+            {onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-100 bg-white text-ink-600 hover:border-brand-300 hover:text-brand-700"
+                aria-label="Close assistant"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 

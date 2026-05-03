@@ -10,15 +10,27 @@ export type Category = {
 
 export type FarmerProfile = {
   id: string;
+  userId?: string;
   name: string;
   farmName: string;
   state: string;
   district: string;
+  shopName?: string;
+  shopLocation?: string;
+  phone?: string;
   rating: number;
   verified: boolean;
   yearsActive: number;
   speciality: string[];
   responseTime: string;
+};
+
+export type SellerProfile = {
+  farmerId: string;
+  userId: string;
+  shopName: string;
+  shopLocation: string;
+  phone: string;
 };
 
 export type Review = {
@@ -103,11 +115,27 @@ export type Order = {
   deliveryCharge: number;
   discount: number;
   total: number;
-  paymentMode: "COD" | "UPI" | "Razorpay" | "Stripe";
+  paymentMode: "COD" | "UPI" | "Razorpay" | "Stripe" | "Wallet";
   status: OrderStatus;
   placedAt: string;
   estimatedDelivery: string;
   address: UserAddress;
+};
+
+export type WalletTransactionType = "deposit" | "withdraw" | "debit" | "credit";
+
+export type WalletTransaction = {
+  type: WalletTransactionType;
+  amount: number;
+  description: string;
+  orderId?: string;
+  createdAt: string;
+};
+
+export type Wallet = {
+  userId: string;
+  balance: number;
+  transactions: WalletTransaction[];
 };
 
 export type MandiRate = {

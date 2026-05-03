@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { chatRequestSchema } from "@/lib/schemas";
-import { getChatHistory, processChatMessage } from "@/lib/services/chatbot";
+import { clearChatHistory, getChatHistory, processChatMessage } from "@/lib/services/chatbot";
 
 export const dynamic = "force-dynamic";
 
@@ -44,4 +44,15 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json(result, { status: 201 });
+}
+
+export async function DELETE(request: NextRequest) {
+  const sessionId = request.nextUrl.searchParams.get("sessionId");
+
+  if (!sessionId) {
+    return NextResponse.json({ error: "Missing session id." }, { status: 400 });
+  }
+
+  await clearChatHistory(sessionId);
+  return NextResponse.json({ message: "Chat history deleted." });
 }

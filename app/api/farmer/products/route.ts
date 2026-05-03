@@ -1,4 +1,6 @@
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { getFarmerProducts } from "@/lib/services/catalog";
 import { farmerProductSchema } from "@/lib/schemas";
@@ -10,12 +12,26 @@ const DEFAULT_FARMER_ID = "farmer-1";
 const DEFAULT_FARMER_NAME = "Rakesh Kumar";
 
 export async function GET(request: NextRequest) {
-  const farmerId = request.nextUrl.searchParams.get("farmerId") ?? DEFAULT_FARMER_ID;
+  const session = await getServerSession(authOptions);
+  const farmerId =
+    request.nextUrl.searchParams.get("farmerId") ??
+    session?.user?.farmerId ??
+    DEFAULT_FARMER_ID;
   const products = await getFarmerProducts(farmerId);
   return NextResponse.json({ products });
 }
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Please sign in first." }, { status: 401 });
+  }
+
+  if (!["farmer", "admin"].includes(session.user.role)) {
+    return NextResponse.json({ error: "Seller access only." }, { status: 403 });
+  }
+
   const body = await request.json();
   const parsed = farmerProductSchema.safeParse(body);
 
@@ -50,8 +66,8 @@ export async function POST(request: NextRequest) {
     id: `prod-${Date.now().toString(36)}`,
     slug,
     name: parsed.data.name,
-    farmerId: parsed.data.farmerId ?? DEFAULT_FARMER_ID,
-    farmerName: parsed.data.farmerName ?? DEFAULT_FARMER_NAME,
+    farmerId: session.user.farmerId ?? parsed.data.farmerId ?? DEFAULT_FARMER_ID,
+    farmerName: session.user.name ?? parsed.data.farmerName ?? DEFAULT_FARMER_NAME,
     category: parsed.data.category,
     state: parsed.data.state,
     description: parsed.data.description,

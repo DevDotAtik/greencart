@@ -18,6 +18,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const order = createOrder(parsed.data);
+  const order = await createOrder(parsed.data);
   return NextResponse.json({ order }, { status: 201 });
 }

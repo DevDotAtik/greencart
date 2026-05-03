@@ -1,9 +1,14 @@
+import { getServerSession } from "next-auth";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { OrdersClient } from "@/components/orders/orders-client";
-import { orders } from "@/lib/mock-data";
+import { authOptions } from "@/lib/auth";
+import { getOrdersByUserId } from "@/lib/services/orders";
 
-export default function OrdersPage() {
+export default async function OrdersPage() {
+  const session = await getServerSession(authOptions);
+  const seededOrders = await getOrdersByUserId(session?.user?.id ?? "user-1");
+
   return (
     <>
       <Navbar />
@@ -16,7 +21,7 @@ export default function OrdersPage() {
           </p>
         </div>
         <div className="mt-8">
-          <OrdersClient seededOrders={orders} />
+          <OrdersClient seededOrders={seededOrders} />
         </div>
       </main>
       <Footer />

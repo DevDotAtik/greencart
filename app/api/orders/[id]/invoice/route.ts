@@ -6,7 +6,7 @@ type InvoiceRouteProps = {
 };
 
 export async function GET(_: Request, { params }: InvoiceRouteProps) {
-  const order = getOrderById(params.id);
+  const order = await getOrderById(params.id);
 
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });

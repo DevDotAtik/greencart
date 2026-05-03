@@ -7,29 +7,57 @@ import { useWishlistStore } from "@/hooks/use-wishlist-store";
 import { ProductVisual } from "@/components/shared/product-visual";
 
 export function AccountOverview() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { ids } = useWishlistStore();
-  const user =
-    users.find((candidate) => candidate.email === (session?.user?.email ?? "buyer@greencart.in")) ??
-    {
-      ...users[0],
-      name: session?.user?.name ?? "GreenCart User",
-      email: session?.user?.email ?? "buyer@greencart.in",
-      role: session?.user?.role ?? "buyer",
-      addresses: [],
-      wishlist: [],
-    };
+  const user = session?.user?.email
+    ? (users.find((candidate) => candidate.email === session.user.email) ?? {
+        id: session.user.id,
+        name: session.user.name ?? "GreenCart User",
+        email: session.user.email,
+        mobile: "",
+        role: session.user.role,
+        password: "",
+        avatar: session.user.name?.slice(0, 2).toUpperCase() ?? "GU",
+        farmerId: session.user.farmerId,
+        wishlist: [],
+        addresses: [],
+      })
+    : null;
+
+  if (status === "loading") {
+    return (
+      <div className="surface-card p-6">
+        <p className="text-sm text-ink-500">Loading account...</p>
+      </div>
+    );
+  }
+
+  if (!session?.user || !user) {
+    return (
+      <div className="surface-card p-6">
+        <p className="text-lg font-extrabold">Please sign in</p>
+        <p className="mt-2 text-sm text-ink-500">
+          Your account details are available after login.
+        </p>
+        <Link href="/login" className="primary-button mt-5 rounded-2xl">
+          Go to login
+        </Link>
+      </div>
+    );
+  }
+
   const wishlistProducts = products.filter((product) =>
     [...user.wishlist, ...ids].includes(product.id),
   );
+  const role = session.user.role;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
       <div className="space-y-6">
         <div className="surface-card p-6">
-          <p className="text-2xl font-extrabold">{session?.user?.name ?? user.name}</p>
+          <p className="text-2xl font-extrabold">{session.user.name ?? user.name}</p>
           <p className="mt-2 text-sm text-ink-500">
-            {session?.user?.email ?? user.email} | {session?.user?.role ?? user.role}
+            {session.user.email ?? user.email} | {session.user.role}
           </p>
           <div className="mt-6 space-y-4">
             <div className="rounded-2xl bg-brand-50/60 p-4">
@@ -55,6 +83,9 @@ export function AccountOverview() {
         <div className="surface-card p-6">
           <p className="text-xl font-extrabold">Quick links</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <Link href="/account/wallet" className="secondary-button rounded-2xl">
+              My wallet
+            </Link>
             <Link href="/auctions" className="secondary-button rounded-2xl">
               Live auctions
             </Link>
@@ -67,12 +98,21 @@ export function AccountOverview() {
             <Link href="/cart" className="secondary-button rounded-2xl">
               Cart
             </Link>
-            <Link href="/farmer/dashboard" className="secondary-button rounded-2xl">
-              Seller dashboard
-            </Link>
-            <Link href="/admin" className="secondary-button rounded-2xl">
-              Admin panel
-            </Link>
+            {role === "farmer" || role === "admin" ? (
+              <Link href="/farmer/dashboard" className="secondary-button rounded-2xl">
+                Seller dashboard
+              </Link>
+            ) : null}
+            {role === "farmer" || role === "admin" ? (
+              <Link href="/seller/wallet" className="secondary-button rounded-2xl">
+                Seller wallet
+              </Link>
+            ) : null}
+            {role === "admin" ? (
+              <Link href="/admin" className="secondary-button rounded-2xl">
+                Admin panel
+              </Link>
+            ) : null}
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { registerSchema } from "@/lib/schemas";
 import { ensureSeedData } from "@/lib/services/seed";
 import { FarmerModel } from "@/models/Farmer";
 import { UserModel } from "@/models/User";
+import { WalletModel } from "@/models/Wallet";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest) {
       id: farmerId,
       userId,
       farmName: `${parsed.data.name.split(" ")[0]}'s Green Farm`,
+      shopName: `${parsed.data.name.split(" ")[0]}'s Green Farm`,
+      shopLocation: "Not shared yet",
+      phone: parsed.data.mobile,
       state: "Not shared yet",
       district: "Not shared yet",
       rating: 0,
@@ -77,6 +81,12 @@ export async function POST(request: NextRequest) {
     farmerId,
     wishlist: [],
     addresses: [],
+  });
+
+  await WalletModel.create({
+    userId,
+    balance: parsed.data.role === "buyer" ? 15000 : 3000,
+    transactions: [],
   });
 
   return NextResponse.json(

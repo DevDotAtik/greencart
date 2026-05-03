@@ -24,12 +24,10 @@ export function ChatAssistantWidget() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="pointer-events-auto ml-auto inline-flex items-center gap-3 rounded-full bg-brand-600 px-5 py-4 text-sm font-semibold text-white shadow-[0_24px_55px_rgba(47,161,67,0.28)] hover:bg-brand-700"
+        className="pointer-events-auto ml-auto inline-flex items-center gap-3 rounded-full rounded-br-none   bg-brand-600 px-2 py-2 text-sm font-semibold text-white shadow-[0_24px_55px_rgba(47,161,67,0.28)] hover:bg-brand-700"
       >
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/16">
-          <MessageCircleMore className="h-5 w-5" />
-        </span>
-        <span className="pr-1">Ask Assistant</span>
+
+        <span className=""><img src="/logo.png" alt="Krishi Bazaar Logo" width={50} height={50} className="rounded-3xl" /></span>
       </button>
     </div>
   );

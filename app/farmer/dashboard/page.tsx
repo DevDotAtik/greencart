@@ -4,6 +4,7 @@ import { FarmerProductManager } from "@/components/dashboard/farmer-product-mana
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { SellerDashboardNav } from "@/components/seller/seller-dashboard-nav";
 import { authOptions } from "@/lib/auth";
 import { getSellerAuctions } from "@/lib/services/auctions";
 import { getFarmerProducts } from "@/lib/services/catalog";
@@ -13,6 +14,7 @@ export default async function FarmerDashboardPage() {
   const session = await getServerSession(authOptions);
   const farmerId = session?.user?.farmerId ?? "farmer-1";
   const sellerUserId = session?.user?.id ?? "user-2";
+  const sellerName = session?.user?.name ?? "Rakesh Kumar";
 
   const [dashboardData, farmerProducts, sellerAuctions] = await Promise.all([
     getFarmerDashboardData(),
@@ -23,7 +25,8 @@ export default async function FarmerDashboardPage() {
   return (
     <>
       <Navbar />
-      <main className="shell py-10">
+      <main className="shell space-y-6 py-10">
+        <SellerDashboardNav />
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <span className="tag-pill">Farmer dashboard</span>
@@ -44,7 +47,11 @@ export default async function FarmerDashboardPage() {
         </div>
 
         <div className="mt-10 grid gap-8 xl:grid-cols-[1fr_1fr_0.9fr]">
-          <FarmerProductManager initialProducts={farmerProducts} />
+          <FarmerProductManager
+            initialProducts={farmerProducts}
+            farmerId={farmerId}
+            farmerName={sellerName}
+          />
           <FarmerAuctionManager initialAuctions={sellerAuctions} />
 
           <div className="space-y-8">

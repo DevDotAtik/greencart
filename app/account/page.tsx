@@ -1,8 +1,17 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { AccountOverview } from "@/components/account/account-overview";
+import { authOptions } from "@/lib/auth";
 
-export default function AccountPage() {
+export default async function AccountPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
   return (
     <>
       <Navbar />

@@ -1,11 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
-import { Leaf } from "lucide-react";
 
 export function Logo() {
   return (
     <Link href="/" className="inline-flex items-center gap-3">
-      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-soft">
-        <Leaf className="h-5 w-5" />
+      <span className="flex items-center justify-center rounded-2xl bg-brand-500 text-white shadow-soft">
+        <Image
+          src="/logo.png"
+          alt="Krishi Bazaar Logo"
+          width={40}
+          height={40}
+          className="rounded-sm object-cover"
+        />
       </span>
       <span>
         <span className="block text-lg font-extrabold tracking-tight">Krishi Bazaar</span>

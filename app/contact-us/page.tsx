@@ -6,17 +6,17 @@ import { Navbar } from "@/components/layout/navbar";
 const contactCards = [
   {
     title: "Email",
-    copy: "hello@greencart.in",
+    copy: "devdeotatik@gmail.com",
     icon: Mail,
   },
   {
     title: "Phone",
-    copy: "+91 98765 43210",
+    copy: "+91 78409 81635",
     icon: Phone,
   },
   {
     title: "Operations",
-    copy: "Nashik, Maharashtra",
+    copy: "Pune, Maharashtra",
     icon: MapPin,
   },
 ];

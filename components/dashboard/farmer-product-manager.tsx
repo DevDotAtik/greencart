@@ -7,6 +7,8 @@ import { formatCurrency } from "@/utils/format";
 
 type FarmerProductManagerProps = {
   initialProducts: Product[];
+  farmerId: string;
+  farmerName: string;
 };
 
 const defaultImage =
@@ -14,6 +16,8 @@ const defaultImage =
 
 export function FarmerProductManager({
   initialProducts,
+  farmerId,
+  farmerName,
 }: FarmerProductManagerProps) {
   const [products, setProducts] = useState(initialProducts);
   const [showForm, setShowForm] = useState(false);
@@ -61,8 +65,8 @@ export function FarmerProductManager({
           .split(",")
           .map((image) => image.trim())
           .filter(Boolean),
-        farmerId: "farmer-1",
-        farmerName: "Rakesh Kumar",
+        farmerId,
+        farmerName,
       }),
     });
 

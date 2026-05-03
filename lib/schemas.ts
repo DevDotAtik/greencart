@@ -11,12 +11,12 @@ export const registerSchema = z.object({
 export const orderSchema = z.object({
   customerName: z.string().min(2),
   email: z.string().email(),
-  phone: z.string().min(10).max(13),
+  phone: z.string().regex(/^\d{10,13}$/, "Phone number must be 10 to 13 digits."),
   addressLine: z.string().min(6),
   city: z.string().min(2),
   state: z.string().min(2),
   pincode: z.string().length(6),
-  paymentMode: z.enum(["COD", "UPI", "Razorpay", "Stripe"]),
+  paymentMode: z.enum(["COD", "UPI", "Razorpay", "Stripe", "Wallet"]),
   items: z
     .array(
       z.object({
@@ -26,6 +26,16 @@ export const orderSchema = z.object({
     )
     .min(1),
   couponCode: z.string().optional(),
+});
+
+export const sellerProfileSchema = z.object({
+  shopName: z.string().min(2).max(80),
+  shopLocation: z.string().min(2).max(120),
+  phone: z.string().regex(/^\d{10,13}$/, "Phone number must be 10 to 13 digits."),
+});
+
+export const walletAmountSchema = z.object({
+  amount: z.coerce.number().positive().max(1_000_000),
 });
 
 export const farmerProductSchema = z.object({

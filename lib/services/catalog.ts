@@ -6,6 +6,7 @@ import { CategoryModel } from "@/models/Category";
 import { FarmerModel } from "@/models/Farmer";
 import { ProductModel } from "@/models/Product";
 import { UserModel } from "@/models/User";
+import { getOrdersByUserId } from "@/lib/services/orders";
 import { ensureSeedData } from "@/lib/services/seed";
 
 export type ProductFilters = {
@@ -280,7 +281,7 @@ export async function getUserByEmail(email: string): Promise<DemoUser | undefine
 }
 
 export async function getUserOrders(userId: string): Promise<Order[]> {
-  return orders.filter((order) => order.userId === userId);
+  return getOrdersByUserId(userId);
 }
 
 export async function getFarmerById(farmerId: string): Promise<FarmerProfile | undefined> {

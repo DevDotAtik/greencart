@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mic, Search, Sparkles } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useI18n } from "@/hooks/use-i18n";
@@ -50,13 +50,6 @@ export function SearchBar({ className }: SearchBarProps) {
           placeholder={dictionary.searchPlaceholder}
           className="w-full bg-transparent text-sm outline-none placeholder:text-ink-400"
         />
-        <button
-          type="button"
-          className="hidden rounded-lg bg-brand-50 p-2 text-ink-500 md:inline-flex"
-          aria-label="Voice search coming soon"
-        >
-          <Mic className="h-4 w-4" />
-        </button>
       </div>
 
       {results.length ? (

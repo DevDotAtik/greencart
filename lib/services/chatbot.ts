@@ -290,6 +290,16 @@ export async function getChatHistory(sessionId: string) {
   );
 }
 
+export async function clearChatHistory(sessionId: string) {
+  if (!hasDatabase()) {
+    return { deletedCount: 0 };
+  }
+
+  await connectToDatabase();
+  const result = await ChatMessageModel.deleteMany({ sessionId });
+  return { deletedCount: result.deletedCount ?? 0 };
+}
+
 async function detectIntent(query: string): Promise<IntentResult> {
   const faqMatch = findFaqAnswer(query);
 

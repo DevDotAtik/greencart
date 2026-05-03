@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { products } from "@/lib/mock-data";
@@ -8,7 +9,7 @@ import { useOrderStore } from "@/hooks/use-order-store";
 import { PINCODE_SERVICEABLE_PREFIXES } from "@/lib/constants";
 import { formatCurrency } from "@/utils/format";
 
-const payments = ["COD", "UPI", "Razorpay", "Stripe"] as const;
+const payments = ["Wallet"] as const;
 
 export function CheckoutForm() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export function CheckoutForm() {
     city: "Noida",
     state: "Uttar Pradesh",
     pincode: "201301",
-    paymentMode: "UPI",
+    paymentMode: "Wallet",
   });
 
   const summary = useMemo(() => {
@@ -52,7 +53,7 @@ export function CheckoutForm() {
     setLoading(true);
     setMessage("");
 
-    const response = await fetch("/api/orders", {
+    const response = await fetch("/api/order/place", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -132,7 +133,7 @@ export function CheckoutForm() {
         </div>
 
         <div className="surface-card p-6">
-          <p className="text-xl font-extrabold">Payment options</p>
+          <p className="text-xl font-extrabold">Wallet payment</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {payments.map((payment) => (
               <label
@@ -153,13 +154,14 @@ export function CheckoutForm() {
                 />
                 <p className="font-semibold">{payment}</p>
                 <p className="mt-1 text-sm text-ink-500">
-                  {payment === "COD"
-                    ? "Cash on delivery available for select pincodes."
-                    : `${payment} integration ready for production payment gateway setup.`}
+                  Orders are placed using your GreenCart wallet balance.
                 </p>
               </label>
             ))}
           </div>
+          <p className="mt-4 text-sm text-ink-500">
+            Need more money first? Open your <Link href="/account/wallet" className="font-semibold text-brand-700">wallet</Link> to deposit funds.
+          </p>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ type OrderByIdRouteProps = {
 };
 
 export async function GET(_: Request, { params }: OrderByIdRouteProps) {
-  const order = getOrderById(params.id);
+  const order = await getOrderById(params.id);
 
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -22,7 +22,7 @@ export async function PATCH(request: Request, { params }: OrderByIdRouteProps) {
     return NextResponse.json({ error: "Unsupported order action" }, { status: 400 });
   }
 
-  const existingOrder = getOrderById(params.id);
+  const existingOrder = await getOrderById(params.id);
 
   if (!existingOrder) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -35,6 +35,6 @@ export async function PATCH(request: Request, { params }: OrderByIdRouteProps) {
     );
   }
 
-  const order = updateOrderStatus(params.id, "Cancelled");
+  const order = await updateOrderStatus(params.id, "Cancelled");
   return NextResponse.json({ order });
 }
