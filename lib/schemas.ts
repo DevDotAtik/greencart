@@ -55,6 +55,10 @@ export const farmerProductSchema = z.object({
   description: z.string().min(20),
 });
 
+export const productStockUpdateSchema = z.object({
+  stock: z.coerce.number().min(0),
+});
+
 export const enquirySchema = z.object({
   type: z.enum(["sell", "bulk", "contact"]),
   name: z.string().min(2),

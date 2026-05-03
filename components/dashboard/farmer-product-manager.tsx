@@ -23,6 +23,9 @@ export function FarmerProductManager({
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [editingStockId, setEditingStockId] = useState<string | null>(null);
+  const [stockDraft, setStockDraft] = useState<Record<string, string>>({});
+  const [stockLoadingId, setStockLoadingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     category: "vegetables",
@@ -100,6 +103,41 @@ export function FarmerProductManager({
     setLoading(false);
     setShowForm(false);
     setMessage(data.message ?? "Product created successfully.");
+  }
+
+  async function handleStockUpdate(productId: string) {
+    const nextStock = Number(stockDraft[productId] ?? "0");
+    setMessage("");
+    setStockLoadingId(productId);
+
+    const response = await fetch(`/api/farmer/products/${productId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stock: nextStock }),
+    });
+
+    const data = (await response.json()) as {
+      error?: string;
+      message?: string;
+      product?: Product;
+    };
+
+    setStockLoadingId(null);
+
+    if (!response.ok || !data.product) {
+      setMessage(data.error ?? "Unable to update stock right now.");
+      return;
+    }
+
+    setProducts((current) =>
+      current.map((product) => (product.id === productId ? data.product! : product)),
+    );
+    setEditingStockId(null);
+    setStockDraft((current) => ({
+      ...current,
+      [productId]: String(data.product?.stock ?? nextStock),
+    }));
+    setMessage(data.message ?? "Stock updated successfully.");
   }
 
   return (
@@ -246,9 +284,59 @@ export function FarmerProductManager({
             </div>
             <div className="text-left sm:text-right">
               <p className="text-xl font-extrabold">{formatCurrency(product.price)}</p>
-              <button type="button" className="secondary-button mt-4">
-                Update stock
-              </button>
+              {editingStockId === product.id ? (
+                <div className="mt-4 space-y-3">
+                  <input
+                    value={stockDraft[product.id] ?? String(product.stock)}
+                    onChange={(event) =>
+                      setStockDraft((current) => ({
+                        ...current,
+                        [product.id]: event.target.value,
+                      }))
+                    }
+                    className="input-shell w-full sm:w-28"
+                    type="number"
+                    min="0"
+                  />
+                  <div className="flex gap-2 sm:justify-end">
+                    <button
+                      type="button"
+                      onClick={() => void handleStockUpdate(product.id)}
+                      disabled={stockLoadingId === product.id}
+                      className="primary-button px-4 py-2 text-xs disabled:opacity-60"
+                    >
+                      {stockLoadingId === product.id ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingStockId(null);
+                        setStockDraft((current) => ({
+                          ...current,
+                          [product.id]: String(product.stock),
+                        }));
+                      }}
+                      className="secondary-button px-4 py-2 text-xs"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingStockId(product.id);
+                    setStockDraft((current) => ({
+                      ...current,
+                      [product.id]: String(product.stock),
+                    }));
+                  }}
+                  className="secondary-button mt-4"
+                >
+                  Update stock
+                </button>
+              )}
             </div>
           </div>
         ))}
