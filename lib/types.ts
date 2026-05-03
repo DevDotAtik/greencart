@@ -169,6 +169,7 @@ export type Auction = {
   sellerFarmerId?: string;
   sellerName: string;
   productName: string;
+  image?: string;
   description: string;
   quantity: string;
   basePrice: number;

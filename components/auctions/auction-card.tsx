@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Clock3, Gavel, Trophy, User2 } from "lucide-react";
+import { ProductVisual } from "@/components/shared/product-visual";
 import type { Auction } from "@/lib/types";
 import { formatCurrency, formatDateTime } from "@/utils/format";
 
@@ -15,6 +16,14 @@ export function AuctionCard({ auction }: AuctionCardProps) {
 
   return (
     <article className="surface-card p-5">
+      {auction.image ? (
+        <ProductVisual
+          title={auction.productName}
+          subtitle={auction.quantity}
+          palette={auction.image}
+          className="mb-5 h-52"
+        />
+      ) : null}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-2xl font-extrabold text-emerald-950">{auction.productName}</p>

@@ -7,6 +7,7 @@ const auctionSchema = new Schema(
     sellerFarmerId: { type: String, index: true },
     sellerName: { type: String, required: true },
     productName: { type: String, required: true, index: true },
+    image: String,
     description: { type: String, required: true },
     quantity: { type: String, required: true },
     basePrice: { type: Number, required: true, min: 1 },

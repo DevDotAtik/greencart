@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       sellerFarmerId: session.user.farmerId,
       sellerName: session.user.name ?? "Farmer",
       productName: parsed.data.productName,
+      image: parsed.data.image,
       description: parsed.data.description,
       quantity: parsed.data.quantity,
       basePrice: parsed.data.basePrice,

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BidForm } from "@/components/auctions/bid-form";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
+import { ProductVisual } from "@/components/shared/product-visual";
 import { AuctionError, getAuctionById, getBidHistory } from "@/lib/services/auctions";
 import { formatCurrency, formatDateTime } from "@/utils/format";
 
@@ -57,6 +58,14 @@ export default async function AuctionDetailPage({
       <main className="shell py-10">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <section className="surface-card p-6 sm:p-8">
+            {auction.image ? (
+              <ProductVisual
+                title={auction.productName}
+                subtitle={auction.quantity}
+                palette={auction.image}
+                className="mb-6 h-72"
+              />
+            ) : null}
             <span className="tag-pill">Auction detail</span>
             <h1 className="mt-5 text-4xl font-extrabold text-emerald-950">{auction.productName}</h1>
             <p className="mt-4 text-base leading-7 text-ink-600">{auction.description}</p>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { ProductVisual } from "@/components/shared/product-visual";
 import type { Auction } from "@/lib/types";
+import { uploadImageFile } from "@/lib/upload-client";
 import { formatCurrency, formatDateTime } from "@/utils/format";
 
 type FarmerAuctionManagerProps = {
@@ -20,10 +22,12 @@ export function FarmerAuctionManager({
   const [auctions, setAuctions] = useState(initialAuctions);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [message, setMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [form, setForm] = useState({
     productName: "",
+    image: "",
     description: "",
     quantity: "",
     basePrice: "0",
@@ -42,6 +46,7 @@ export function FarmerAuctionManager({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         productName: form.productName,
+        image: form.image || undefined,
         description: form.description,
         quantity: form.quantity,
         basePrice: Number(form.basePrice),
@@ -70,6 +75,7 @@ export function FarmerAuctionManager({
     setAuctions((current) => [data.auction!, ...current]);
     setForm({
       productName: "",
+      image: "",
       description: "",
       quantity: "",
       basePrice: "0",
@@ -79,6 +85,31 @@ export function FarmerAuctionManager({
     setShowForm(false);
     setMessage("Auction created successfully.");
     setFieldErrors({});
+  }
+
+  async function handleAuctionImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setUploadingImage(true);
+    setMessage("");
+
+    try {
+      const imageUrl = await uploadImageFile(file, "auctions");
+      setForm((current) => ({
+        ...current,
+        image: imageUrl,
+      }));
+      setMessage("Auction image uploaded successfully.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to upload image.");
+    } finally {
+      setUploadingImage(false);
+      event.target.value = "";
+    }
   }
 
   return (
@@ -105,6 +136,28 @@ export function FarmerAuctionManager({
             required
           />
           {fieldErrors.productName ? <p className="text-sm text-red-600">{fieldErrors.productName[0]}</p> : null}
+          <div className="lg:col-span-2">
+            <label className="mb-2 block text-sm font-medium text-ink-600">Upload auction image</label>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={(event) => void handleAuctionImageUpload(event)}
+              className="block w-full text-sm text-ink-600 file:mr-4 file:rounded-xl file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:font-semibold file:text-brand-700"
+            />
+            <p className="mt-2 text-xs text-ink-500">
+              This image is saved with the auction and shown to buyers.
+            </p>
+          </div>
+          {form.image ? (
+            <div className="lg:col-span-2">
+              <ProductVisual
+                title={form.productName || "Auction preview"}
+                subtitle="Auction image preview"
+                palette={form.image}
+                className="h-40"
+              />
+            </div>
+          ) : null}
           <input
             value={form.quantity}
             onChange={(event) => setForm((current) => ({ ...current, quantity: event.target.value }))}
@@ -151,8 +204,8 @@ export function FarmerAuctionManager({
           />
           {fieldErrors.description ? <p className="text-sm text-red-600 lg:col-span-2">{fieldErrors.description[0]}</p> : null}
           {message ? <p className="text-sm text-brand-700 lg:col-span-2">{message}</p> : null}
-          <button type="submit" disabled={loading} className="primary-button lg:col-span-2 disabled:opacity-60">
-            {loading ? "Creating auction..." : "Save auction"}
+          <button type="submit" disabled={loading || uploadingImage} className="primary-button lg:col-span-2 disabled:opacity-60">
+            {uploadingImage ? "Uploading image..." : loading ? "Creating auction..." : "Save auction"}
           </button>
         </form>
       ) : null}
@@ -163,6 +216,14 @@ export function FarmerAuctionManager({
         {auctions.length ? (
           auctions.map((auction) => (
             <div key={auction.id} className="rounded-2xl border border-brand-100 p-4">
+              {auction.image ? (
+                <ProductVisual
+                  title={auction.productName}
+                  subtitle={auction.quantity}
+                  palette={auction.image}
+                  className="mb-4 h-40"
+                />
+              ) : null}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-lg font-bold text-emerald-950">{auction.productName}</p>

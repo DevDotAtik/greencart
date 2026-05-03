@@ -10,17 +10,42 @@ type FarmerProductRouteProps = {
   params: { id: string };
 };
 
-export async function PATCH(request: NextRequest, { params }: FarmerProductRouteProps) {
+async function getAuthorizedProduct(productId: string) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Please sign in first." }, { status: 401 });
+    return { error: "Please sign in first.", status: 401 as const };
   }
 
   if (!["farmer", "admin"].includes(session.user.role)) {
-    return NextResponse.json({ error: "Seller access only." }, { status: 403 });
+    return { error: "Seller access only.", status: 403 as const };
   }
 
+  const connection = await connectToDatabase();
+
+  if (!connection) {
+    return {
+      error: "MongoDB is not configured. Add MONGODB_URI to enable product updates.",
+      status: 500 as const,
+    };
+  }
+
+  await ensureSeedData();
+
+  const existingProduct = await ProductModel.findOne({ id: productId });
+
+  if (!existingProduct) {
+    return { error: "Product not found.", status: 404 as const };
+  }
+
+  if (session.user.role !== "admin" && existingProduct.farmerId !== session.user.farmerId) {
+    return { error: "You can only manage your own products.", status: 403 as const };
+  }
+
+  return { session, product: existingProduct };
+}
+
+export async function PATCH(request: NextRequest, { params }: FarmerProductRouteProps) {
   const body = await request.json();
   const parsed = productStockUpdateSchema.safeParse(body);
 
@@ -31,31 +56,17 @@ export async function PATCH(request: NextRequest, { params }: FarmerProductRoute
     );
   }
 
-  const connection = await connectToDatabase();
+  const authorized = await getAuthorizedProduct(params.id);
 
-  if (!connection) {
-    return NextResponse.json(
-      { error: "MongoDB is not configured. Add MONGODB_URI to enable stock updates." },
-      { status: 500 },
-    );
+  if ("error" in authorized) {
+    const errorMessage =
+      authorized.status === 500
+        ? "MongoDB is not configured. Add MONGODB_URI to enable stock updates."
+        : authorized.error;
+    return NextResponse.json({ error: errorMessage }, { status: authorized.status });
   }
 
-  await ensureSeedData();
-
-  const existingProduct = await ProductModel.findOne({ id: params.id });
-
-  if (!existingProduct) {
-    return NextResponse.json({ error: "Product not found." }, { status: 404 });
-  }
-
-  if (
-    session.user.role !== "admin" &&
-    session.user.farmerId &&
-    existingProduct.farmerId !== session.user.farmerId
-  ) {
-    return NextResponse.json({ error: "You can only update your own products." }, { status: 403 });
-  }
-
+  const existingProduct = authorized.product;
   existingProduct.stock = parsed.data.stock;
   await existingProduct.save();
 
@@ -66,4 +77,20 @@ export async function PATCH(request: NextRequest, { params }: FarmerProductRoute
       harvestDate: existingProduct.harvestDate?.toISOString?.() ?? new Date().toISOString(),
     },
   });
+}
+
+export async function DELETE(_request: NextRequest, { params }: FarmerProductRouteProps) {
+  const authorized = await getAuthorizedProduct(params.id);
+
+  if ("error" in authorized) {
+    const errorMessage =
+      authorized.status === 500
+        ? "MongoDB is not configured. Add MONGODB_URI to enable product removal."
+        : authorized.error;
+    return NextResponse.json({ error: errorMessage }, { status: authorized.status });
+  }
+
+  await authorized.product.deleteOne();
+
+  return NextResponse.json({ message: "Product removed successfully." });
 }

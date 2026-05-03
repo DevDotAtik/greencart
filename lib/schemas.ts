@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+const imagePathSchema = z.string().trim().refine((value) => /^(https?:\/\/|\/)/.test(value), {
+  message: "Image path must be a valid URL or uploaded file path.",
+});
+
 export const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -39,20 +43,23 @@ export const walletAmountSchema = z.object({
 });
 
 export const farmerProductSchema = z.object({
-  name: z.string().min(2),
-  category: z.string().min(2),
-  price: z.number().positive(),
-  originalPrice: z.number().positive(),
-  unit: z.string().min(1),
-  state: z.string().min(2),
-  stock: z.number().min(0),
+  name: z.string().trim().min(2, "Product name must be at least 2 characters."),
+  category: z.string().trim().min(2, "Please choose a product category."),
+  price: z.coerce.number().positive("Selling price must be greater than zero."),
+  originalPrice: z.coerce.number().min(0, "Original price cannot be negative."),
+  unit: z.string().trim().min(1, "Unit is required."),
+  state: z.string().trim().min(2, "State is required."),
+  stock: z.coerce.number().min(0, "Stock cannot be negative."),
   organic: z.boolean(),
   farmerId: z.string().optional(),
-  farmerName: z.string().min(2).optional(),
-  deliveryTime: z.string().min(2).optional(),
-  images: z.array(z.string().url()).min(1).optional(),
-  tags: z.array(z.string().min(1)).max(6).optional(),
-  description: z.string().min(20),
+  farmerName: z.string().trim().min(2).optional(),
+  deliveryTime: z.string().trim().min(2).optional(),
+  images: z.array(imagePathSchema).min(1).optional(),
+  tags: z.array(z.string().trim().min(1)).max(6).optional(),
+  description: z
+    .string()
+    .trim()
+    .min(10, "Description must be at least 10 characters long."),
 });
 
 export const productStockUpdateSchema = z.object({
@@ -71,6 +78,7 @@ export const enquirySchema = z.object({
 
 export const createAuctionSchema = z.object({
   productName: z.string().min(2),
+  image: imagePathSchema.optional(),
   description: z.string().min(20),
   quantity: z.string().min(1),
   basePrice: z.coerce.number().positive(),

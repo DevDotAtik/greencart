@@ -136,6 +136,7 @@ export async function createAuction(input: {
   sellerFarmerId?: string;
   sellerName: string;
   productName: string;
+  image?: string;
   description: string;
   quantity: string;
   basePrice: number;
@@ -165,6 +166,7 @@ export async function createAuction(input: {
     sellerFarmerId: input.sellerFarmerId,
     sellerName: input.sellerName,
     productName: input.productName,
+    image: input.image,
     description: input.description,
     quantity: input.quantity,
     basePrice: input.basePrice,

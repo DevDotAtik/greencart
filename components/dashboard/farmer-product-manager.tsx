@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ProductVisual } from "@/components/shared/product-visual";
 import type { Product } from "@/lib/types";
+import { uploadImageFile } from "@/lib/upload-client";
 import { formatCurrency } from "@/utils/format";
 
 type FarmerProductManagerProps = {
@@ -22,10 +23,12 @@ export function FarmerProductManager({
   const [products, setProducts] = useState(initialProducts);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [message, setMessage] = useState("");
   const [editingStockId, setEditingStockId] = useState<string | null>(null);
   const [stockDraft, setStockDraft] = useState<Record<string, string>>({});
   const [stockLoadingId, setStockLoadingId] = useState<string | null>(null);
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     category: "vegetables",
@@ -105,6 +108,42 @@ export function FarmerProductManager({
     setMessage(data.message ?? "Product created successfully.");
   }
 
+  async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? []);
+
+    if (!files.length) {
+      return;
+    }
+
+    setUploadingImages(true);
+    setMessage("");
+
+    try {
+      const uploadedUrls = await Promise.all(
+        files.map((file) => uploadImageFile(file, "products")),
+      );
+
+      setForm((current) => {
+        const existingImages = current.images
+          .split(",")
+          .map((image) => image.trim())
+          .filter(Boolean)
+          .filter((image) => image !== defaultImage);
+
+        return {
+          ...current,
+          images: [...existingImages, ...uploadedUrls].join(", "),
+        };
+      });
+      setMessage("Image uploaded successfully.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to upload image.");
+    } finally {
+      setUploadingImages(false);
+      event.target.value = "";
+    }
+  }
+
   async function handleStockUpdate(productId: string) {
     const nextStock = Number(stockDraft[productId] ?? "0");
     setMessage("");
@@ -138,6 +177,48 @@ export function FarmerProductManager({
       [productId]: String(data.product?.stock ?? nextStock),
     }));
     setMessage(data.message ?? "Stock updated successfully.");
+  }
+
+  async function handleDeleteProduct(productId: string, productName: string) {
+    const confirmed = window.confirm(
+      `Remove "${productName}" from your dashboard and marketplace catalog?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setMessage("");
+    setDeletingProductId(productId);
+
+    const response = await fetch(`/api/farmer/products/${productId}`, {
+      method: "DELETE",
+    });
+
+    const data = (await response.json()) as {
+      error?: string;
+      message?: string;
+    };
+
+    setDeletingProductId(null);
+
+    if (!response.ok) {
+      setMessage(data.error ?? "Unable to remove product right now.");
+      return;
+    }
+
+    setProducts((current) => current.filter((product) => product.id !== productId));
+
+    if (editingStockId === productId) {
+      setEditingStockId(null);
+    }
+
+    setStockDraft((current) => {
+      const nextDraft = { ...current };
+      delete nextDraft[productId];
+      return nextDraft;
+    });
+    setMessage(data.message ?? "Product removed successfully.");
   }
 
   return (
@@ -236,6 +317,29 @@ export function FarmerProductManager({
             placeholder="Online image URLs separated by commas"
             required
           />
+          <div className="lg:col-span-2">
+            <label className="mb-2 block text-sm font-medium text-ink-600">Upload product images</label>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              multiple
+              onChange={(event) => void handleImageUpload(event)}
+              className="block w-full text-sm text-ink-600 file:mr-4 file:rounded-xl file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:font-semibold file:text-brand-700"
+            />
+            <p className="mt-2 text-xs text-ink-500">
+              Uploaded images are saved to the database and added to the product image list.
+            </p>
+          </div>
+          {form.images ? (
+            <div className="lg:col-span-2">
+              <ProductVisual
+                title={form.name || "Product preview"}
+                subtitle={form.unit || "Uploaded image preview"}
+                palette={form.images.split(",").map((image) => image.trim()).filter(Boolean)[0] ?? defaultImage}
+                className="h-40"
+              />
+            </div>
+          ) : null}
           <textarea
             value={form.description}
             onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
@@ -252,8 +356,8 @@ export function FarmerProductManager({
             Organic product
           </label>
           {message ? <p className="text-sm text-brand-700 lg:col-span-2">{message}</p> : null}
-          <button type="submit" disabled={loading} className="primary-button lg:col-span-2 disabled:opacity-60">
-            {loading ? "Saving product..." : "Save product"}
+          <button type="submit" disabled={loading || uploadingImages} className="primary-button lg:col-span-2 disabled:opacity-60">
+            {uploadingImages ? "Uploading image..." : loading ? "Saving product..." : "Save product"}
           </button>
         </form>
       ) : null}
@@ -323,19 +427,29 @@ export function FarmerProductManager({
                   </div>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingStockId(product.id);
-                    setStockDraft((current) => ({
-                      ...current,
-                      [product.id]: String(product.stock),
-                    }));
-                  }}
-                  className="secondary-button mt-4"
-                >
-                  Update stock
-                </button>
+                <div className="mt-4 flex flex-wrap gap-2 sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingStockId(product.id);
+                      setStockDraft((current) => ({
+                        ...current,
+                        [product.id]: String(product.stock),
+                      }));
+                    }}
+                    className="secondary-button"
+                  >
+                    Update stock
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleDeleteProduct(product.id, product.name)}
+                    disabled={deletingProductId === product.id}
+                    className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {deletingProductId === product.id ? "Removing..." : "Remove product"}
+                  </button>
+                </div>
               )}
             </div>
           </div>

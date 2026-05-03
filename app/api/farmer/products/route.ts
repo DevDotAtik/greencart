@@ -11,6 +11,16 @@ import { slugify } from "@/utils/format";
 const DEFAULT_FARMER_ID = "farmer-1";
 const DEFAULT_FARMER_NAME = "Rakesh Kumar";
 
+function getValidationMessage(fieldErrors: Record<string, string[] | undefined>) {
+  const firstEntry = Object.entries(fieldErrors).find(([, messages]) => messages?.length);
+
+  if (!firstEntry) {
+    return "Product payload is invalid";
+  }
+
+  return firstEntry[1]?.[0] ?? "Product payload is invalid";
+}
+
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   const farmerId =
@@ -36,8 +46,13 @@ export async function POST(request: NextRequest) {
   const parsed = farmerProductSchema.safeParse(body);
 
   if (!parsed.success) {
+    const flattened = parsed.error.flatten();
+
     return NextResponse.json(
-      { error: "Product payload is invalid", issues: parsed.error.flatten() },
+      {
+        error: getValidationMessage(flattened.fieldErrors),
+        issues: flattened,
+      },
       { status: 400 },
     );
   }
@@ -76,7 +91,7 @@ export async function POST(request: NextRequest) {
     stock: parsed.data.stock,
     organic: parsed.data.organic,
     price: parsed.data.price,
-    originalPrice: parsed.data.originalPrice,
+    originalPrice: parsed.data.originalPrice > 0 ? parsed.data.originalPrice : parsed.data.price,
     deliveryTime: parsed.data.deliveryTime ?? "2-4 days",
     rating: 0,
     reviewCount: 0,
