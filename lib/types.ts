@@ -168,6 +168,13 @@ export type AuctionBid = {
 
 export type ChatRole = "user" | "assistant";
 
+export type ChatPageContext = {
+  pathname?: string;
+  pageTitle?: string;
+  focusProduct?: string;
+  visibleProducts?: string[];
+};
+
 export type ChatMessage = {
   id: string;
   sessionId: string;

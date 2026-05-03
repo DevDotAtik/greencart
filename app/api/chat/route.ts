@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
   const result = await processChatMessage({
     sessionId: parsed.data.sessionId,
     message: parsed.data.message,
+    pageContext: parsed.data.pageContext,
     user: session?.user
       ? {
           id: session.user.id,

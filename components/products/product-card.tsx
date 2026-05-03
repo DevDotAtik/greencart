@@ -18,7 +18,7 @@ export function ProductCard({ product }: ProductCardProps) {
   );
 
   return (
-    <article className="surface-card overflow-hidden p-4">
+    <article className="surface-card overflow-hidden p-4" data-product-name={product.name}>
       <div className="relative">
         <Link href={`/products/${product.slug}`}>
           <ProductVisual

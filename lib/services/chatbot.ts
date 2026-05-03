@@ -3,15 +3,17 @@ import { connectToDatabase } from "@/lib/db";
 import { env } from "@/lib/env";
 import { orders, products, users } from "@/lib/mock-data";
 import { ensureSeedData } from "@/lib/services/seed";
-import type { ChatMessage, Order, Product, Role } from "@/lib/types";
+import type { ChatMessage, ChatPageContext, Order, Product, Role } from "@/lib/types";
 import { ChatMessageModel } from "@/models/ChatMessage";
 import { OrderModel } from "@/models/Order";
 import { ProductModel } from "@/models/Product";
 import { UserModel } from "@/models/User";
+import { formatCurrency } from "@/utils/format";
 
 type ChatContext = {
   sessionId: string;
   message: string;
+  pageContext?: ChatPageContext;
   user?: {
     id: string;
     name?: string | null;
@@ -124,7 +126,15 @@ function extractProductCandidate(query: string) {
 }
 
 function formatProductLine(product: Product) {
-  return `${product.name} - ?${product.price} (${product.unit})`;
+  return `${product.name} - ${formatCurrency(product.price)} (${product.unit})`;
+}
+
+function isGenericProductReference(value: string) {
+  return /^(this|that|it|these|those|product|item|current product)?$/i.test(value.trim());
+}
+
+function getContextProductNames(context?: ChatPageContext) {
+  return Array.from(new Set((context?.visibleProducts ?? []).filter(Boolean)));
 }
 
 function getResponseText(response: unknown) {
@@ -161,6 +171,7 @@ async function getAllProducts() {
   const records = (await ProductModel.find().lean()) as ProductRecord[];
   return records.map((record) => ({
     ...record,
+    category: record.category === "organic" ? "grains" : record.category,
     harvestDate:
       typeof record.harvestDate === "string"
         ? record.harvestDate
@@ -280,7 +291,6 @@ export async function getChatHistory(sessionId: string) {
 }
 
 async function detectIntent(query: string): Promise<IntentResult> {
-  const normalized = query.toLowerCase();
   const faqMatch = findFaqAnswer(query);
 
   if (/what products|show products|available products|what do you have/i.test(query)) {
@@ -344,12 +354,18 @@ async function answerFromDatabase(intent: IntentResult, context: ChatContext) {
   const allProducts = await getAllProducts();
 
   if (intent.intent === "list_products") {
-    const topProducts = allProducts.slice(0, 8);
+    const visibleProductNames = getContextProductNames(context.pageContext);
+    const contextualProducts = visibleProductNames.length
+      ? allProducts.filter((product) =>
+          visibleProductNames.some((name) => name.toLowerCase() === product.name.toLowerCase()),
+        )
+      : [];
+    const topProducts = (contextualProducts.length ? contextualProducts : allProducts).slice(0, 8);
 
     return {
       source: "database" as const,
       content: topProducts.length
-        ? `Here are some products available on Krishi Bazaar:\n${topProducts
+        ? `${contextualProducts.length ? "Here are the products visible on this page right now:" : "Here are some products available on Krishi Bazaar:"}\n${topProducts
             .map((product) => `- ${formatProductLine(product)}`)
             .join("\n")}`
         : "I could not find any products in the database right now.",
@@ -357,7 +373,20 @@ async function answerFromDatabase(intent: IntentResult, context: ChatContext) {
   }
 
   if (intent.intent === "price_lookup") {
-    const candidate = (intent.productName ?? extractProductCandidate(context.message)).toLowerCase();
+    const rawCandidate = intent.productName ?? extractProductCandidate(context.message);
+    const fallbackCandidate =
+      context.pageContext?.focusProduct ?? getContextProductNames(context.pageContext)[0] ?? "";
+    const resolvedCandidate =
+      rawCandidate && !isGenericProductReference(rawCandidate) ? rawCandidate : fallbackCandidate;
+    const candidate = resolvedCandidate.toLowerCase();
+
+    if (!candidate) {
+      return {
+        source: "database" as const,
+        content: "Tell me which product you want and I can check its price for you.",
+      };
+    }
+
     const matched = allProducts.find(
       (product) =>
         product.name.toLowerCase().includes(candidate) ||
@@ -367,13 +396,13 @@ async function answerFromDatabase(intent: IntentResult, context: ChatContext) {
     if (matched) {
       return {
         source: "database" as const,
-        content: `${matched.name} costs ?${matched.price} for ${matched.unit}.`,
+        content: `${matched.name} costs ${formatCurrency(matched.price)} for ${matched.unit}.`,
       };
     }
 
     return {
       source: "database" as const,
-      content: `I could not find a product matching "${intent.productName ?? candidate}" in the database.`,
+      content: `I could not find a product matching "${resolvedCandidate || "that item"}" in the database.`,
     };
   }
 
@@ -407,7 +436,7 @@ async function answerFromDatabase(intent: IntentResult, context: ChatContext) {
 
     return {
       source: "database" as const,
-      content: `Order ${targetOrder.id} is currently "${targetOrder.status}". Total amount is ?${targetOrder.total}, and estimated delivery is ${new Date(targetOrder.estimatedDelivery).toLocaleString("en-IN")}.`,
+      content: `Order ${targetOrder.id} is currently "${targetOrder.status}". Total amount is ${formatCurrency(targetOrder.total)}, and estimated delivery is ${new Date(targetOrder.estimatedDelivery).toLocaleString("en-IN")}.`,
     };
   }
 
@@ -438,7 +467,7 @@ async function answerFromDatabase(intent: IntentResult, context: ChatContext) {
   return null;
 }
 
-async function answerGeneralQuestion(query: string, productsContext: Product[]) {
+async function answerGeneralQuestion(query: string, productsContext: Product[], context: ChatContext) {
   const faqMatch = findFaqAnswer(query);
 
   if (faqMatch) {
@@ -458,18 +487,33 @@ async function answerGeneralQuestion(query: string, productsContext: Product[]) 
 
   const productSummary = productsContext
     .slice(0, 12)
-    .map((product) => `${product.name} | ?${product.price} | ${product.unit} | ${product.category}`)
+    .map((product) => `${product.name} | ${formatCurrency(product.price)} | ${product.unit} | ${product.category}`)
     .join("\n");
+  const pageContextSummary = context.pageContext
+    ? [
+        context.pageContext.pathname ? `Path: ${context.pageContext.pathname}` : "",
+        context.pageContext.pageTitle ? `Page title: ${context.pageContext.pageTitle}` : "",
+        context.pageContext.focusProduct ? `Focused product: ${context.pageContext.focusProduct}` : "",
+        getContextProductNames(context.pageContext).length
+          ? `Visible products: ${getContextProductNames(context.pageContext).join(", ")}`
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : "No page context provided.";
 
   const response = await openaiClient.responses.create({
     model: env.openaiModel,
     temperature: 0.4,
     instructions:
-      "You are Krishi Bazaar's website assistant. Answer clearly and briefly. Use the marketplace context provided. Do not invent prices or order details.",
+      "You are Krishi Bazaar's website assistant. Answer clearly and briefly. Use the marketplace and current-page context provided. Do not invent prices, inventory, or order details.",
     input: `Marketplace context:
 Krishi Bazaar sells farm produce, grains, dairy, seeds, fertilisers, crop care, and agri inputs.
 Known products:
 ${productSummary}
+
+Current page context:
+${pageContextSummary}
 
 User question:
 ${query}`,
@@ -498,7 +542,7 @@ export async function processChatMessage(context: ChatContext) {
   const allProducts = directAnswer ? [] : await getAllProducts();
   const answer =
     directAnswer ??
-    (await answerGeneralQuestion(trimmed, allProducts));
+    (await answerGeneralQuestion(trimmed, allProducts, context));
 
   const assistantMessage = await saveChatMessage({
     sessionId: context.sessionId,

@@ -1,12 +1,19 @@
 "use client";
 
+import { X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ChatMessage } from "@/lib/types";
+import type { ChatMessage, ChatPageContext } from "@/lib/types";
 
 type ChatApiResponse = {
   sessionId: string;
   assistantMessage: ChatMessage;
   userMessage: ChatMessage;
+};
+
+type ChatAssistantProps = {
+  onClose?: () => void;
+  variant?: "page" | "widget";
 };
 
 function getOrCreateSessionId() {
@@ -28,13 +35,49 @@ function formatTime(value: string) {
   });
 }
 
-export function ChatAssistant() {
+function getFallbackPageTitle(pathname: string) {
+  if (pathname === "/") {
+    return "Home";
+  }
+
+  return pathname
+    .split("/")
+    .filter(Boolean)
+    .map((part) => part.replace(/-/g, " "))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" / ");
+}
+
+function collectPageContext(pathname: string): ChatPageContext {
+  const visibleProducts = Array.from(
+    new Set(
+      Array.from(document.querySelectorAll<HTMLElement>("[data-product-name]"))
+        .map((node) => node.dataset.productName?.trim())
+        .filter(Boolean) as string[],
+    ),
+  ).slice(0, 10);
+
+  const focusProduct =
+    document.querySelector<HTMLElement>("[data-product-focus='true']")?.dataset.productName ??
+    visibleProducts[0];
+
+  return {
+    pathname,
+    pageTitle: document.title.split("|")[0]?.trim() || getFallbackPageTitle(pathname),
+    focusProduct,
+    visibleProducts,
+  };
+}
+
+export function ChatAssistant({ onClose, variant = "page" }: ChatAssistantProps) {
+  const pathname = usePathname();
   const [sessionId, setSessionId] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typing, setTyping] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [error, setError] = useState("");
+  const [pageContext, setPageContext] = useState<ChatPageContext | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -42,28 +85,63 @@ export function ChatAssistant() {
     setSessionId(id);
 
     async function loadHistory() {
-      const response = await fetch(`/api/chat?sessionId=${encodeURIComponent(id)}`);
-      const data = (await response.json()) as { messages?: ChatMessage[] };
-      setMessages(data.messages ?? []);
-      setLoadingHistory(false);
+      try {
+        const response = await fetch(`/api/chat?sessionId=${encodeURIComponent(id)}`);
+        const data = (await response.json()) as { messages?: ChatMessage[] };
+        setMessages(data.messages ?? []);
+      } catch {
+        setError("Unable to load chat history right now.");
+      } finally {
+        setLoadingHistory(false);
+      }
     }
 
     void loadHistory();
   }, []);
 
   useEffect(() => {
+    setPageContext(collectPageContext(pathname));
+  }, [pathname]);
+
+  useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const suggestions = useMemo(
-    () => [
+  const suggestions = useMemo(() => {
+    if (pathname.startsWith("/products/") && pageContext?.focusProduct) {
+      return [
+        `Tell me about ${pageContext.focusProduct}`,
+        `What is the price of ${pageContext.focusProduct}?`,
+        "Show similar products",
+        "How fast can this be delivered?",
+      ];
+    }
+
+    if (pathname.startsWith("/products")) {
+      return [
+        "Show products on this page",
+        "Which of these products are best sellers?",
+        "Price of tomatoes?",
+        "What payment methods are available?",
+      ];
+    }
+
+    if (pathname.startsWith("/orders")) {
+      return [
+        "What is my latest order status?",
+        "How can I cancel an order?",
+        "How do I download an invoice?",
+        "What payment methods are available?",
+      ];
+    }
+
+    return [
       "What products do you have?",
       "Price of tomatoes?",
       "What is my latest order status?",
       "What payment methods are available?",
-    ],
-    [],
-  );
+    ];
+  }, [pageContext?.focusProduct, pathname]);
 
   async function sendChat(customMessage?: string) {
     const outgoing = (customMessage ?? message).trim();
@@ -86,38 +164,65 @@ export function ChatAssistant() {
     setMessages((current) => [...current, optimisticMessage]);
     setMessage("");
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sessionId,
-        message: outgoing,
-      }),
-    });
+    try {
+      const currentContext = collectPageContext(pathname);
+      setPageContext(currentContext);
 
-    const data = (await response.json()) as ChatApiResponse & { error?: string };
-    setTyping(false);
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          message: outgoing,
+          pageContext: currentContext,
+        }),
+      });
 
-    if (!response.ok || !data.assistantMessage || !data.userMessage) {
-      setError(data.error ?? "Unable to send message right now.");
+      const data = (await response.json()) as ChatApiResponse & { error?: string };
+      setTyping(false);
+
+      if (!response.ok || !data.assistantMessage || !data.userMessage) {
+        setError(data.error ?? "Unable to send message right now.");
+        setMessages((current) => current.filter((item) => item.id !== optimisticMessage.id));
+        return;
+      }
+
+      setMessages((current) => [
+        ...current.filter((item) => item.id !== optimisticMessage.id),
+        data.userMessage,
+        data.assistantMessage,
+      ]);
+    } catch {
+      setTyping(false);
+      setError("Unable to send message right now.");
       setMessages((current) => current.filter((item) => item.id !== optimisticMessage.id));
-      return;
     }
-
-    setMessages((current) => [
-      ...current.filter((item) => item.id !== optimisticMessage.id),
-      data.userMessage,
-      data.assistantMessage,
-    ]);
   }
 
   return (
-    <div className="surface-card overflow-hidden">
+    <div className="surface-card overflow-hidden shadow-xl">
       <div className="border-b border-brand-100 bg-brand-50/70 px-5 py-4">
-        <p className="text-lg font-extrabold text-emerald-950">Krishi Bazaar Assistant</p>
-        <p className="mt-1 text-sm text-ink-600">
-          Ask about products, prices, orders, or general website questions.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-lg font-extrabold text-emerald-950">Krishi Bazaar Assistant</p>
+            <p className="mt-1 text-sm text-ink-600">
+              Ask about products, prices, orders, or general website questions.
+            </p>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">
+              Viewing {pageContext?.pageTitle ?? getFallbackPageTitle(pathname)}
+            </p>
+          </div>
+          {onClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-100 bg-white text-ink-600 hover:border-brand-300 hover:text-brand-700"
+              aria-label="Close assistant"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="space-y-4 bg-[#f6fbf6] px-4 py-5 sm:px-5">
@@ -134,7 +239,11 @@ export function ChatAssistant() {
           ))}
         </div>
 
-        <div className="h-[460px] overflow-y-auto rounded-2xl border border-brand-100 bg-white p-4">
+        <div
+          className={`overflow-y-auto rounded-2xl border border-brand-100 bg-white p-4 ${
+            variant === "widget" ? "h-[380px]" : "h-[460px]"
+          }`}
+        >
           {loadingHistory ? (
             <div className="text-sm text-ink-500">Loading chat history...</div>
           ) : messages.length ? (

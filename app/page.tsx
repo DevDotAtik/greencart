@@ -30,8 +30,6 @@ const categoryVisuals: Record<string, string> = {
     "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=1200&q=80",
   dairy:
     "https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=1200&q=80",
-  organic:
-    "https://images.unsplash.com/photo-1532336414038-cf19250c5757?auto=format&fit=crop&w=1200&q=80",
   seeds:
     "https://images.unsplash.com/photo-1457530378978-8bac673b8062?auto=format&fit=crop&w=1200&q=80",
   fertilisers:
@@ -126,7 +124,7 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow="Shop by category"
             title="From daily fresh produce to crop care essentials"
-            description="The catalog now includes fruits, vegetables, grains, dairy, seeds, fertilisers and pesticide-focused crop care products."
+            description="The catalog now includes fruits, vegetables, grains, dairy, seeds, fertilisers and crop care products."
           />
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -137,6 +135,7 @@ export default async function HomePage() {
                   subtitle={category.description}
                   palette={categoryVisuals[category.slug] ?? category.accent}
                   className="h-60"
+                  showText
                 />
               </Link>
             ))}
@@ -148,8 +147,8 @@ export default async function HomePage() {
             <div>
               <SectionHeading
                 eyebrow="Trending now"
-                title="Popular products with updated online imagery"
-                description="Fresh kitchen staples and agri inputs now use remote images for a more visual shopping experience."
+                title="Popular picks for homes, retailers and growers"
+                description="Fast-moving produce and agri essentials customers are buying right now."
               />
               <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {trendingProducts.slice(0, 6).map((product) => (
@@ -203,6 +202,20 @@ export default async function HomePage() {
         </section>
 
         <section className="shell mt-16">
+          <SectionHeading
+            eyebrow="Featured catalog"
+            title="More products for homes, retailers and repeat buyers"
+            description="The marketplace now blends grocery-style shopping with farm input discovery."
+          />
+
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {featuredProducts.slice(0, 8).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+
+        <section className="shell mt-16">
           <div className="grid gap-6 xl:grid-cols-[1fr_1fr_1fr]">
             <MandiRatesPanel rates={homeData.mandiRates} />
 
@@ -230,7 +243,7 @@ export default async function HomePage() {
                       <div>
                         <p className="font-bold">{farmer.farmName}</p>
                         <p className="text-sm text-ink-500">
-                          {farmer.name}, {farmer.state}
+                          {farmer.name} · {farmer.district} {farmer.state}
                         </p>
                       </div>
                       <span className="tag-pill">{farmer.rating.toFixed(1)} rating</span>
@@ -246,20 +259,6 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="shell mt-16">
-          <SectionHeading
-            eyebrow="Featured catalog"
-            title="More products for homes, retailers and repeat buyers"
-            description="The marketplace now blends grocery-style shopping with farm input discovery."
-          />
-
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {featuredProducts.slice(0, 8).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
           </div>
         </section>
 

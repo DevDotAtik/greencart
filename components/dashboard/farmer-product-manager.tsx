@@ -128,9 +128,8 @@ export function FarmerProductManager({
           >
             <option value="vegetables">Vegetables</option>
             <option value="fruits">Fruits</option>
-            <option value="grains">Grains & Atta</option>
+            <option value="grains">Grains & Pantry</option>
             <option value="dairy">Dairy</option>
-            <option value="organic">Organic</option>
             <option value="seeds">Seeds</option>
             <option value="fertilisers">Fertilisers</option>
             <option value="crop-care">Crop Care</option>

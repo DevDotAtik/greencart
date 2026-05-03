@@ -47,7 +47,7 @@ export function AccountOverview() {
             <div className="rounded-2xl bg-brand-50/60 p-4">
               <p className="text-sm font-bold text-ink-700">Notifications</p>
               <p className="mt-2 text-sm text-ink-500">
-                Price drop alert enabled for organic turmeric and mango box.
+                Price drop alert enabled for turmeric fingers and mango box.
               </p>
             </div>
           </div>

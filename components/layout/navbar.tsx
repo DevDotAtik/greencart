@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, ShoppingCart, UserCircle2, X } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
@@ -24,10 +25,14 @@ const utilityLinks = [
 ];
 
 export function Navbar() {
+  const pathname = usePathname();
   const { data: session } = useSession();
   const { items } = useCartStore();
   const { dictionary } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <header className="sticky top-0 z-40 border-b border-brand-100 bg-white/95 backdrop-blur-xl">
@@ -96,9 +101,16 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-xl px-4  py-2 text-sm font-semibold text-ink-600 hover:bg-brand-50 hover:text-brand-700"
+                  className={`relative overflow-hidden rounded-xl px-4 py-2 text-sm font-semibold ${
+                    isActive(item.href)
+                      ? "bg-brand-100/80 text-brand-800 shadow-sm"
+                      : "text-ink-600 hover:bg-brand-50 hover:text-brand-700"
+                  }`}
                 >
-                  {dictionary[item.key]}
+                  {isActive(item.href) ? (
+                    <span className="pointer-events-none absolute right-1 top-1 h-4 w-10 rounded-full bg-white/80 blur-sm" />
+                  ) : null}
+                  <span className="relative">{dictionary[item.key]}</span>
                 </Link>
               ))}
             </nav>
@@ -139,7 +151,11 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm font-semibold text-ink-600 hover:bg-brand-50 hover:text-brand-700"
+                className={`rounded-xl px-4 py-3 text-sm font-semibold ${
+                  isActive(item.href)
+                    ? "bg-brand-100/80 text-brand-800"
+                    : "text-ink-600 hover:bg-brand-50 hover:text-brand-700"
+                }`}
               >
                 {dictionary[item.key]}
               </Link>

@@ -1,6 +1,7 @@
 import { addDays } from "date-fns";
 import { COUPONS } from "@/lib/constants";
 import { orders, products, users } from "@/lib/mock-data";
+import { buildInvoiceText } from "@/lib/order-utils";
 import type { Order } from "@/lib/types";
 
 export function calculateOrderSummary(
@@ -68,6 +69,7 @@ export function createOrder(payload: {
     },
   };
 
+  orders.unshift(order);
   return order;
 }
 
@@ -75,25 +77,17 @@ export function getOrderById(id: string) {
   return orders.find((order) => order.id === id);
 }
 
-export function buildInvoice(order: Order) {
-  const lines = order.items
-    .map((item) => {
-      const product = products.find((candidate) => candidate.id === item.productId);
-      return `${product?.name ?? item.productId} x ${item.quantity} = ₹${item.price * item.quantity}`;
-    })
-    .join("\n");
+export function updateOrderStatus(id: string, status: Order["status"]) {
+  const order = orders.find((candidate) => candidate.id === id);
 
-  return [
-    `Invoice: ${order.id}`,
-    `Status: ${order.status}`,
-    `Customer: ${order.address.recipient}`,
-    `Payment: ${order.paymentMode}`,
-    "",
-    lines,
-    "",
-    `Subtotal: ₹${order.subtotal}`,
-    `Delivery: ₹${order.deliveryCharge}`,
-    `Discount: ₹${order.discount}`,
-    `Total: ₹${order.total}`,
-  ].join("\n");
+  if (!order) {
+    return null;
+  }
+
+  order.status = status;
+  return order;
+}
+
+export function buildInvoice(order: Order) {
+  return buildInvoiceText(order, products);
 }

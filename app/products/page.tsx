@@ -9,7 +9,6 @@ type ProductsPageProps = {
     search?: string;
     category?: string;
     state?: string;
-    organic?: string;
     rating?: string;
     sort?: string;
   };
@@ -29,7 +28,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <SectionHeading
           eyebrow="Marketplace"
           title="Browse fresh produce, seeds, pesticides and fertilisers"
-          description="A wider and cleaner catalog with sharper cards, simpler filters and updated online product imagery."
+          description="A wider and cleaner catalog with sharper cards, simpler filters and cleaner product imagery."
         />
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -79,8 +78,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 </div>
               </div>
               <div className="rounded-2xl bg-brand-50 p-4 text-sm text-brand-700">
-                Tip: combine `category`, `state`, `organic`, `rating`, and `sort`
-                query params for shareable filter URLs.
+                Tip: combine `category`, `state`, `rating`, and `sort` query params for shareable filter URLs.
               </div>
             </div>
           </aside>
@@ -91,9 +89,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 Showing {productList.length} products
               </p>
               <div className="flex flex-wrap gap-2">
-                <a href="/products?organic=true" className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:bg-brand-50">
-                  Organic only
-                </a>
                 <a href="/products?rating=4.5" className="rounded-xl border border-brand-100 px-3 py-2 text-xs font-semibold text-ink-600 hover:border-brand-300 hover:bg-brand-50">
                   4.5+ rating
                 </a>

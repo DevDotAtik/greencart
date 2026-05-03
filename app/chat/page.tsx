@@ -14,8 +14,8 @@ export default function ChatPage() {
       <main className="shell py-10">
         <SectionHeading
           eyebrow="Smart assistant"
-          title="Website chatbot powered by database + OpenAI"
-          description="This assistant can answer product, price, order, account, and support questions using real website data and OpenAI fallback for general questions."
+          title="Website assistant powered by product data, order data and OpenAI"
+          description="The same assistant is now available as a floating popup across the site, with current page and product context passed into each chat request."
         />
 
         <div className="mt-8">

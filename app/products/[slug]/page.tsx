@@ -51,13 +51,17 @@ export default async function ProductDetailPage({
     getRelatedProducts(product),
     getFarmerById(product.farmerId),
   ]);
+  const categoryLabel = product.category
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 
   return (
     <>
       <Navbar />
       <main className="shell py-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
-          <div className="space-y-4">
+          <div className="space-y-4" data-product-name={product.name} data-product-focus="true">
             <ProductVisual
               title={product.name}
               subtitle={product.description}
@@ -80,7 +84,7 @@ export default async function ProductDetailPage({
           <div className="space-y-6">
             <div className="surface-card p-6">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="tag-pill">{product.category}</span>
+                <span className="tag-pill">{categoryLabel}</span>
                 {product.organic ? <span className="tag-pill bg-brand-50">Organic</span> : null}
                 <RatingStars rating={product.rating} />
               </div>

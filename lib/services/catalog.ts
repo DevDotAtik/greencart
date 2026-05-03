@@ -32,6 +32,7 @@ type UserRecord = DemoUser;
 function normalizeProduct(product: ProductRecord): Product {
   return {
     ...product,
+    category: product.category === "organic" ? "grains" : product.category,
     harvestDate:
       typeof product.harvestDate === "string"
         ? product.harvestDate
@@ -48,6 +49,13 @@ function normalizeFarmer(farmer: FarmerRecord): FarmerProfile {
 function normalizeCategory(category: CategoryRecord): Category {
   return {
     ...category,
+    id: category.id === "organic" ? "grains" : category.id,
+    name: category.id === "grains" ? "Grains & Pantry" : category.name,
+    slug: category.slug === "organic" ? "grains" : category.slug,
+    description:
+      category.slug === "grains"
+        ? "Atta, chawal, dal, masalas and pantry staples from local growers."
+        : category.description,
   };
 }
 
@@ -116,7 +124,9 @@ async function getMongoCategories() {
   await connectToDatabase();
   await ensureSeedData();
   const mongoCategories = (await CategoryModel.find().sort({ name: 1 }).lean()) as CategoryRecord[];
-  return mongoCategories.map(normalizeCategory);
+  return mongoCategories
+    .filter((category) => category.slug !== "organic")
+    .map(normalizeCategory);
 }
 
 async function getMongoFarmers() {

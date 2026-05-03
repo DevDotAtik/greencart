@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Krishi Bazaar | Direct Farmer Marketplace",
     description:
-      "Buy fresh produce, grains, dairy, seeds, and organic staples directly from verified Indian farmers.",
+      "Buy fresh produce, grains, dairy, seeds, and farm inputs directly from verified Indian farmers.",
     type: "website",
   },
 };

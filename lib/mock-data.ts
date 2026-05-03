@@ -71,9 +71,9 @@ export const categories: Category[] = [
   },
   {
     id: "grains",
-    name: "Grains & Atta",
+    name: "Grains & Pantry",
     slug: "grains",
-    description: "Atta, chawal, dal and millet staples from local growers.",
+    description: "Atta, chawal, dal, masalas and pantry staples from local growers.",
     accent: "from-yellow-100 to-stone-50",
   },
   {
@@ -82,13 +82,6 @@ export const categories: Category[] = [
     slug: "dairy",
     description: "Fresh paneer, ghee and village dairy products.",
     accent: "from-sky-100 to-cyan-50",
-  },
-  {
-    id: "organic",
-    name: "Organic",
-    slug: "organic",
-    description: "Naturally grown spices, oils and low-chemical produce.",
-    accent: "from-green-100 to-emerald-50",
   },
   {
     id: "seeds",
@@ -339,11 +332,11 @@ export const products: Product[] = [
     name: "Organic Haldi Fingers",
     farmerId: "farmer-3",
     farmerName: "Mahesh Gowda",
-    category: "organic",
+    category: "grains",
     state: "Karnataka",
     description:
       "Sun-dried haldi fingers with strong color and aroma for home grinding and spice use.",
-    tags: ["Organic", "Masala", "Natural"],
+    tags: ["Haldi", "Masala", "Pantry"],
     unit: "2 kg",
     stock: 76,
     organic: true,
@@ -563,11 +556,11 @@ export const products: Product[] = [
     name: "Cold Pressed Groundnut Oil",
     farmerId: "farmer-3",
     farmerName: "Mahesh Gowda",
-    category: "organic",
+    category: "grains",
     state: "Karnataka",
     description:
       "Filtered groundnut oil with a strong roasted aroma for home cooking and snack shops.",
-    tags: ["Oil", "Cold pressed", "Traditional"],
+    tags: ["Oil", "Cold pressed", "Pantry"],
     unit: "1 litre",
     stock: 44,
     organic: true,

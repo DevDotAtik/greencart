@@ -8,7 +8,7 @@ import { cn } from "@/utils/cn";
 const slides = [
   {
     image:
-      "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1620200423727-8127f75d7f53?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     title: "Fresh farm produce and agri inputs in one wide, simple storefront",
     subtitle:
       "Shop fruits, vegetables, seeds, pesticides and fertilisers with a cleaner Krishi Bazaar experience.",

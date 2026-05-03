@@ -6,6 +6,7 @@ type ProductVisualProps = {
   subtitle?: string;
   palette: string;
   className?: string;
+  showText?: boolean;
 };
 
 export function ProductVisual({
@@ -13,15 +14,18 @@ export function ProductVisual({
   subtitle,
   palette,
   className,
+  showText,
 }: ProductVisualProps) {
   const hasImage = /^(https?:\/\/|\/)/.test(palette);
+  const shouldShowText = showText ?? !hasImage;
 
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-5",
+        "relative overflow-hidden rounded-2xl border",
         hasImage ? "border-brand-100 bg-brand-50" : "border-white/80 bg-gradient-to-br",
         !hasImage && palette,
+        shouldShowText ? "p-5" : "p-0",
         className,
       )}
     >
@@ -34,7 +38,9 @@ export function ProductVisual({
             sizes="(max-width: 768px) 100vw, 33vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          {shouldShowText ? (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          ) : null}
         </>
       ) : (
         <>
@@ -43,29 +49,20 @@ export function ProductVisual({
         </>
       )}
 
-      <div className="relative flex h-full flex-col justify-between">
-        <span
-          className={cn(
-            "tag-pill w-fit",
-            hasImage
-              ? "border-transparent bg-white/90 text-emerald-950"
-              : "bg-white/70 text-ink-700",
-          )}
-        >
-          Farm fresh
-        </span>
-
-        <div>
-          <p className={cn("font-serif text-2xl font-bold", hasImage ? "text-white" : "text-ink-900")}>
-            {title}
-          </p>
-          {subtitle ? (
-            <p className={cn("mt-2 text-sm", hasImage ? "text-white/90" : "text-ink-600")}>
-              {subtitle}
+      {shouldShowText ? (
+        <div className="relative flex h-full flex-col justify-end">
+          <div>
+            <p className={cn("font-serif text-2xl font-bold", hasImage ? "text-white" : "text-ink-900")}>
+              {title}
             </p>
-          ) : null}
+            {subtitle ? (
+              <p className={cn("mt-2 text-sm", hasImage ? "text-white/90" : "text-ink-600")}>
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

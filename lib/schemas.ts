@@ -76,4 +76,12 @@ export const placeBidSchema = z.object({
 export const chatRequestSchema = z.object({
   sessionId: z.string().min(3),
   message: z.string().min(1).max(1000),
+  pageContext: z
+    .object({
+      pathname: z.string().max(200).optional(),
+      pageTitle: z.string().max(200).optional(),
+      focusProduct: z.string().max(160).optional(),
+      visibleProducts: z.array(z.string().max(160)).max(12).optional(),
+    })
+    .optional(),
 });
