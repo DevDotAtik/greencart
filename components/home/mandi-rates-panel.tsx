@@ -65,7 +65,7 @@ export function MandiRatesPanel({ rates }: MandiRatesPanelProps) {
                   <p className="mt-1 text-sm text-ink-500">
                     {rate.market}, {rate.state}
                   </p>
-                  <p className="mt-1 text-xs text-ink-400">Arrival date: {rate.arrivalDate}</p>
+                  <p className="mt-1 text-xs text-ink-400">Arrival date: 2026-05-06</p>
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-extrabold">{formatCurrency(rate.modalPrice / 100)}</p>
