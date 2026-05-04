@@ -21,7 +21,7 @@ export default async function AuctionsPage() {
             description="Browse all active auctions, place bids above the current highest bid plus the minimum increment, and track the winner automatically when an auction closes."
           />
           <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-700">
-            Stack: Node.js + Next.js Route Handlers + MongoDB/Mongoose
+            
           </div>
         </div>
 

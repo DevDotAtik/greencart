@@ -82,8 +82,7 @@ export default async function HomePage() {
               Fresh produce and agri supplies with a cleaner, wider storefront.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-ink-600">
-              Krishi Bazaar now uses a lighter green-and-white theme, sharper cards, real Mongo-backed
-              registration, and farmer product creation for a simpler farm commerce experience.
+              
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
