@@ -5,10 +5,10 @@ const imagePathSchema = z.string().trim().refine((value) => /^(https?:\/\/|\/)/.
 });
 
 export const registerSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
+  name: z.string().trim().min(2),
+  email: z.string().trim().email(),
   password: z.string().min(8),
-  mobile: z.string().min(10).max(13),
+  mobile: z.string().trim().regex(/^\d{10,13}$/, "Mobile number must be 10 to 13 digits."),
   role: z.enum(["buyer", "farmer"]).default("buyer"),
 });
 

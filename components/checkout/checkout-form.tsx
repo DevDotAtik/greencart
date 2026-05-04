@@ -9,7 +9,18 @@ import { useOrderStore } from "@/hooks/use-order-store";
 import { PINCODE_SERVICEABLE_PREFIXES } from "@/lib/constants";
 import { formatCurrency } from "@/utils/format";
 
-const payments = ["Wallet"] as const;
+const paymentOptions = [
+  {
+    value: "COD",
+    label: "Cash on Delivery",
+    description: "Pay when your order reaches your doorstep.",
+  },
+  {
+    value: "Wallet",
+    label: "Wallet",
+    description: "Use your GreenCart wallet balance for instant confirmation.",
+  },
+] as const;
 
 export function CheckoutForm() {
   const router = useRouter();
@@ -25,7 +36,7 @@ export function CheckoutForm() {
     city: "Noida",
     state: "Uttar Pradesh",
     pincode: "201301",
-    paymentMode: "Wallet",
+    paymentMode: "COD",
   });
 
   const summary = useMemo(() => {
@@ -133,13 +144,13 @@ export function CheckoutForm() {
         </div>
 
         <div className="surface-card p-6">
-          <p className="text-xl font-extrabold">Wallet payment</p>
+          <p className="text-xl font-extrabold">Choose payment method</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {payments.map((payment) => (
+            {paymentOptions.map((payment) => (
               <label
-                key={payment}
+                key={payment.value}
                 className={`cursor-pointer rounded-3xl border p-4 ${
-                  form.paymentMode === payment
+                  form.paymentMode === payment.value
                     ? "border-brand-300 bg-brand-50"
                     : "border-slate-200"
                 }`}
@@ -147,21 +158,31 @@ export function CheckoutForm() {
                 <input
                   type="radio"
                   name="paymentMode"
-                  value={payment}
-                  checked={form.paymentMode === payment}
-                  onChange={() => setForm((current) => ({ ...current, paymentMode: payment }))}
+                  value={payment.value}
+                  checked={form.paymentMode === payment.value}
+                  onChange={() =>
+                    setForm((current) => ({ ...current, paymentMode: payment.value }))
+                  }
                   className="sr-only"
                 />
-                <p className="font-semibold">{payment}</p>
-                <p className="mt-1 text-sm text-ink-500">
-                  Orders are placed using your GreenCart wallet balance.
-                </p>
+                <p className="font-semibold">{payment.label}</p>
+                <p className="mt-1 text-sm text-ink-500">{payment.description}</p>
               </label>
             ))}
           </div>
-          <p className="mt-4 text-sm text-ink-500">
-            Need more money first? Open your <Link href="/account/wallet" className="font-semibold text-brand-700">wallet</Link> to deposit funds.
-          </p>
+          {form.paymentMode === "Wallet" ? (
+            <p className="mt-4 text-sm text-ink-500">
+              Need more money first? Open your{" "}
+              <Link href="/account/wallet" className="font-semibold text-brand-700">
+                wallet
+              </Link>{" "}
+              to deposit funds.
+            </p>
+          ) : (
+            <p className="mt-4 text-sm text-ink-500">
+              Keep cash ready at delivery time. Our partner may call before arrival.
+            </p>
+          )}
         </div>
       </div>
 
