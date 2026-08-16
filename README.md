@@ -1,6 +1,6 @@
-# GreenCart
+# krishi bazaar
 
-GreenCart is a full-stack farmer marketplace built with Next.js 14 App Router, Tailwind CSS, MongoDB-ready models, NextAuth credentials auth, and a small Express API entry point for standalone backend use.
+krishi bazaar is a full-stack farmer marketplace built with Next.js 14 App Router, Tailwind CSS, MongoDB-ready models, NextAuth credentials auth, and a small Express API entry point for standalone backend use.
 
 It is designed for:
 
